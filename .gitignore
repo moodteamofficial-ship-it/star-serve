@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+.github-token
 
 # Python
 __pycache__/
