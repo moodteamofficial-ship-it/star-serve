@@ -17,6 +17,11 @@ DOCKERHUB_USER="${DOCKERHUB_USER:-}"
 LOCAL_TAG="${LOCAL_TAG:-starserve-api:local}"
 IMAGE="docker.io/${DOCKERHUB_USER}/starserve-api:latest"
 
+if [ -n "${DOCKERHUB_TOKEN:-}" ]; then
+  render_log "Logging in to Docker Hub as ${DOCKERHUB_USER} (DOCKERHUB_TOKEN)"
+  printf '%s' "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USER}" --password-stdin
+fi
+
 docker image inspect "${LOCAL_TAG}" >/dev/null 2>&1 \
   || "${SCRIPT_DIR}/build-api-local.sh"
 

@@ -14,10 +14,12 @@ source "${SCRIPT_DIR}/render-api.sh"
 
 API_HOST="${API_UPSTREAM:-${RENDER_API_HOST}}"
 
-HEALTH_URL="https://${API_HOST}/health"
-code="$(curl -sS -o /dev/null -w '%{http_code}' "${HEALTH_URL}" 2>/dev/null || echo 000)"
-if [ "${code}" != "200" ]; then
-  render_die "Refusing cutover: ${HEALTH_URL} returned HTTP ${code}. Deploy API first (./scripts/render/publish-and-deploy-api.sh) or fix Cloud Run billing."
+if [ "${SKIP_API_HEALTH_CHECK:-false}" != "true" ]; then
+  HEALTH_URL="https://${API_HOST}/health"
+  code="$(curl -sS -o /dev/null -w '%{http_code}' "${HEALTH_URL}" 2>/dev/null || echo 000)"
+  if [ "${code}" != "200" ]; then
+    render_die "Refusing cutover: ${HEALTH_URL} returned HTTP ${code}. Deploy API first (./scripts/render/deploy-git-stack.sh or publish-and-deploy-api.sh)."
+  fi
 fi
 
 for key in API_UPSTREAM SPA_BASE_PATH PORT; do

@@ -38,6 +38,7 @@ PY
 
 render_log "Running alembic upgrade head (${IMAGE})"
 docker run --rm \
+  --env-file "${ENV_FILE}" \
   -e "APP_ENV=production" \
   -e "APP_DEBUG=false" \
   -e "DB_PROVIDER=supabase" \
@@ -45,7 +46,8 @@ docker run --rm \
   -e "DB_NULL_POOL=true" \
   -e "LOG_JSON=true" \
   -e "DATABASE_URL=${DATABASE_URL}" \
+  --entrypoint python \
   "${IMAGE}" \
-  python -m alembic upgrade head
+  -m alembic upgrade head
 
 render_log "Migrations complete"

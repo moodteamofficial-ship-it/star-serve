@@ -11,6 +11,38 @@ services. You do **not** need Cloud Run or GCP billing for the API if you use
 
 Cloud Run `*.run.app` remains **rollback** only for the dashboard nginx proxy.
 
+## Full stack on Render (frontend + backend)
+
+| Component | Render service | Role |
+|-----------|----------------|------|
+| SPA | `starserve-dashboard` | quote domain, `/dashboard`, proxies `/api/v1` |
+| API | `starserve-api` | `https://starserve-api.onrender.com` |
+
+Dashboard env (set by `./scripts/render/apply-dashboard-render.sh`):
+
+- `API_UPSTREAM=starserve-api.onrender.com` (host only)
+- `SPA_BASE_PATH=/dashboard`
+
+The browser always calls **same-origin** `/api/v1`; nginx forwards to the API service (same as the old Cloud Run setup).
+
+**Deploy the API** (pick one):
+
+```bash
+export RENDER_API_KEY=rnd_...   # never commit
+
+# A) Docker Hub — after: docker login
+export DOCKERHUB_USER=your-dockerhub-user
+./scripts/render/build-api-local.sh
+./scripts/render/migrate-local.sh
+./scripts/render/deploy-render-all.sh
+
+# B) GitHub — push this repo (v1.0) to GitHub, connect Render to the repo
+export RENDER_GIT_REPO=https://github.com/YOURORG/starserve-v1
+./scripts/render/deploy-render-all.sh git
+```
+
+Then mount GCS secret file on **starserve-api** and confirm `curl https://starserve-api.onrender.com/health` → 200 and sign-in works.
+
 ## Path A — No GCP (recommended)
 
 Build and migrate on your machine; Render pulls from Docker Hub or builds from Git.

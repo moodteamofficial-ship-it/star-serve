@@ -22,13 +22,14 @@ require_render_api_url
 
 API_SERVICE_ID="$("${SCRIPT_DIR}/create-api-service.sh")"
 
-export API_SERVICE_ID ENV_FILE RENDER_API_BASE_URL RENDER_API_HOST RENDER_API_KEY
+export API_SERVICE_ID ENV_FILE BACKEND_DIR RENDER_API_BASE_URL RENDER_API_HOST RENDER_API_KEY
 python3 <<'PY'
 import json, os, subprocess, sys, urllib.error, urllib.request
 from pathlib import Path
 
 service_id = os.environ["API_SERVICE_ID"]
 env_file = Path(os.environ["ENV_FILE"])
+backend_dir = Path(os.environ["BACKEND_DIR"])
 callback = os.environ["RENDER_API_BASE_URL"]
 token = os.environ["RENDER_API_KEY"]
 
@@ -46,6 +47,19 @@ def read_env(key: str) -> str:
         if len(val) >= 2 and val[0] == val[-1] and val[0] in "\"'":
             val = val[1:-1]
         return val
+    return ""
+
+def read_secret(key: str) -> str:
+    direct = read_env(key)
+    if direct:
+        return direct
+    path_key = f"{key}_PATH"
+    rel = read_env(path_key)
+    if not rel:
+        return ""
+    pem = backend_dir / rel
+    if pem.is_file():
+        return pem.read_text(encoding="utf-8")
     return ""
 
 cors = (
@@ -136,7 +150,7 @@ secret_keys = [
     "GUEST_TENANT_ID",
     "GUEST_SIGNING_SECRET",
 ]
-secrets = {k: read_env(k) for k in secret_keys if read_env(k)}
+secrets = {k: read_secret(k) for k in secret_keys if read_secret(k)}
 
 def put_env(key: str, value: str) -> None:
     body = json.dumps({"value": value}).encode()
@@ -162,6 +176,11 @@ for key in sorted(secrets):
     put_env(key, secrets[key])
     print(f"[render]   secret {key}", flush=True)
 PY
+
+if [ "${SKIP_DASHBOARD_CUTOVER:-false}" = "true" ]; then
+  render_log "Env synced (SKIP_DASHBOARD_CUTOVER=true)"
+  exit 0
+fi
 
 render_log "Waiting for ${RENDER_API_BASE_URL}/health"
 for _ in $(seq 1 60); do

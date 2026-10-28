@@ -8,7 +8,8 @@ source "${SCRIPT_DIR}/config.sh"
 # shellcheck source=render-api.sh
 source "${SCRIPT_DIR}/render-api.sh"
 
-if API_SERVICE_ID="$(render_api_service_id starserve-api 2>/dev/null || true)"; then
+API_SERVICE_ID="$(render_api_service_id starserve-api 2>/dev/null || true)"
+if [ -n "${API_SERVICE_ID}" ]; then
   render_log "starserve-api already exists: ${API_SERVICE_ID}"
   printf '%s' "${API_SERVICE_ID}"
   exit 0

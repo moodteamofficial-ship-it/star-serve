@@ -1,7 +1,8 @@
 # Render Blueprint — build API + SPA on Render from Git (no GCP Artifact Registry / Cloud Run).
 # Connect your GitHub repo in Render, then apply this blueprint or create services manually.
 #
-# Set RENDER_GIT_REPO to your remote, e.g. https://github.com/BirdviewInsurance/StarServe
+# Push v1.0 to GitHub, connect Render → New Blueprint, or use:
+#   RENDER_GIT_REPO=https://github.com/BirdviewInsurance/starserve-v1 ./scripts/render/deploy-git-stack.sh
 
 services:
   - type: web

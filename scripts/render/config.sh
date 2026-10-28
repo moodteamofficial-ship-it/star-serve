@@ -25,7 +25,7 @@ RENDER_API_IMAGE="${RENDER_API_IMAGE:-}"
 # Git → Render builds Dockerfile on deploy (no GAR). Example: https://github.com/org/StarServe
 RENDER_API_REPO="${RENDER_API_REPO:-}"
 RENDER_API_BRANCH="${RENDER_API_BRANCH:-main}"
-RENDER_API_ROOT_DIR="${RENDER_API_ROOT_DIR:-v1.0/backend}"
+RENDER_API_ROOT_DIR="${RENDER_API_ROOT_DIR:-backend}"
 
 render_log() {
   printf '[render] %s\n' "$*"

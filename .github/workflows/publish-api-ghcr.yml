@@ -1,0 +1,32 @@
+# Build Star Serve API image for Render (no Cloud Run / GAR required).
+# After pushing this repo to GitHub: Actions → Publish API to GHCR → Run workflow.
+name: Publish API to GHCR
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/starserve-api:latest
+            ghcr.io/${{ github.repository_owner }}/starserve-api:${{ github.sha }}
