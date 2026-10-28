@@ -98,10 +98,18 @@ async def ussd_callback(
     if request.method.upper() == "GET":
         probe = extract_birdview_params(request, None)
         if not (probe.get("SESSIONID") and probe.get("MSISDN")):
-            return adapter.render(
-                text=_static_welcome_text(),
+            welcome = _static_welcome_text().strip() or (
+                "Welcome to StarServe Insurance\n"
+                "1. Motor Insurance Cover\n"
+                "2. Report a Claim\n"
+                "3. Follow Up a Claim"
+            )
+            rendered = adapter.render(
+                text=welcome,
                 response_type=UssdResponseType.CONTINUE.value,
             )
+            rendered.headers["X-StarServe-Ussd"] = "welcome-probe"
+            return rendered
 
     try:
         if request.method.upper() == "POST":
