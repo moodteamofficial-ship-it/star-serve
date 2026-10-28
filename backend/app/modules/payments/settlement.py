@@ -16,7 +16,8 @@ StarServe rails:
                      Definite replies that the note is approved (e.g. "Policy
                      Approved. Proceed to Issue cert"). There is no StarServe
                      webhook — finance receipt confirm is only a fallback.
-  BIRDVIEW         → BirdView STK first; after confirmed SUCCESS, Definite
+  BIRDVIEW         → Legacy BirdView STK (deprecated for Star Serve guests).
+  MPESA            → Safaricom Daraja STK; after confirmed SUCCESS, Definite
                      method 3 once (wallet deduct) then certificate.
 
 Only ``settles_on_initiate`` rails may transition a local payment to SUCCESS
@@ -45,6 +46,7 @@ class SettlementRail(StrEnum):
     DEFINITE_WALLET = "DEFINITE_WALLET"
     DEFINITE_MPESA = "DEFINITE_MPESA"
     BIRDVIEW = "BIRDVIEW"
+    MPESA = "MPESA"
 
 
 # Canonical rails only. Ambiguous legacy names ("MPESA", "WALLET") are refused:
@@ -54,6 +56,7 @@ _RAIL_ALIASES: dict[str, SettlementRail] = {
     SettlementRail.DEFINITE_WALLET.value: SettlementRail.DEFINITE_WALLET,
     SettlementRail.DEFINITE_MPESA.value: SettlementRail.DEFINITE_MPESA,
     SettlementRail.BIRDVIEW.value: SettlementRail.BIRDVIEW,
+    SettlementRail.MPESA.value: SettlementRail.MPESA,
 }
 
 
@@ -106,10 +109,18 @@ PLANS: dict[SettlementRail, SettlementPlan] = {
     ),
     SettlementRail.BIRDVIEW: SettlementPlan(
         rail=SettlementRail.BIRDVIEW,
-        label="BirdView M-Pesa Push",
+        label="BirdView M-Pesa Push (legacy)",
         requires_phone=True,
         local_async_stk=True,
-        # After BirdView confirms cash, settle insurer float once (wallet).
+        definite_payment_method=DefinitePaymentMethod.WALLET,
+        definite_settle_phase="after_local_success",
+        settles_on_initiate=False,
+    ),
+    SettlementRail.MPESA: SettlementPlan(
+        rail=SettlementRail.MPESA,
+        label="M-Pesa (Safaricom Daraja)",
+        requires_phone=True,
+        local_async_stk=True,
         definite_payment_method=DefinitePaymentMethod.WALLET,
         definite_settle_phase="after_local_success",
         settles_on_initiate=False,
@@ -128,7 +139,7 @@ AWAIT_CONFIRMATION_RAILS: frozenset[str] = frozenset(
 
 # Guests may only use customer-funded STK that stays PENDING until a signed webhook.
 # DEFINITE_MPESA is staff-only: Definite initiatePayment HTTP success is not proof of pay.
-GUEST_ALLOWED_RAILS: frozenset[str] = frozenset({SettlementRail.BIRDVIEW.value})
+GUEST_ALLOWED_RAILS: frozenset[str] = frozenset({SettlementRail.MPESA.value})
 
 
 def resolve_settlement_plan(method: str) -> SettlementPlan:
@@ -138,6 +149,6 @@ def resolve_settlement_plan(method: str) -> SettlementPlan:
     rail = _RAIL_ALIASES.get(key)
     if rail is None:
         raise ValidationAppError(
-            "Supported payment methods: DEFINITE_WALLET, DEFINITE_MPESA, BIRDVIEW"
+            "Supported payment methods: DEFINITE_WALLET, DEFINITE_MPESA, MPESA, BIRDVIEW"
         )
     return PLANS[rail]

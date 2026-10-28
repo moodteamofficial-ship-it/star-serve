@@ -26,7 +26,11 @@ def test_definite_wallet_is_the_only_rail_that_settles_inline() -> None:
     assert resolve_settlement_plan("DEFINITE_MPESA").settles_on_initiate is False
     assert resolve_settlement_plan("BIRDVIEW").settles_on_initiate is False
     assert AWAIT_CONFIRMATION_RAILS == frozenset(
-        {SettlementRail.DEFINITE_MPESA.value, SettlementRail.BIRDVIEW.value}
+        {
+            SettlementRail.DEFINITE_MPESA.value,
+            SettlementRail.BIRDVIEW.value,
+            SettlementRail.MPESA.value,
+        }
     )
 
 
@@ -52,7 +56,14 @@ def test_resolve_birdview_settles_wallet_after_local_success() -> None:
     assert plan.definite_settle_phase == "after_local_success"
 
 
-@pytest.mark.parametrize("method", ["MPESA", "WALLET", "", "definite", "CARD"])
+def test_resolve_mpesa_daraja_rail() -> None:
+    plan = resolve_settlement_plan("MPESA")
+    assert plan.rail is SettlementRail.MPESA
+    assert plan.local_async_stk is True
+    assert plan.definite_settle_phase == "after_local_success"
+
+
+@pytest.mark.parametrize("method", ["WALLET", "", "definite", "CARD"])
 def test_ambiguous_and_legacy_methods_are_refused(method: str) -> None:
     """These used to resolve onto a rail that marked the payment SUCCESS locally."""
     with pytest.raises(ValidationAppError):
@@ -144,5 +155,6 @@ def test_payment_get_syncs_definite_stk_confirmation() -> None:
 
 def test_guests_cannot_use_agency_wallet_rail() -> None:
     assert SettlementRail.DEFINITE_WALLET.value not in GUEST_ALLOWED_RAILS
-    assert SettlementRail.BIRDVIEW.value in GUEST_ALLOWED_RAILS
+    assert SettlementRail.MPESA.value in GUEST_ALLOWED_RAILS
+    assert SettlementRail.BIRDVIEW.value not in GUEST_ALLOWED_RAILS
     assert SettlementRail.DEFINITE_MPESA.value not in GUEST_ALLOWED_RAILS

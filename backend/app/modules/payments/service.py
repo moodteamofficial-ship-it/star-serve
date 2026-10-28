@@ -295,7 +295,8 @@ class PaymentService:
         - DEFINITE_MPESA: Definite (method 1) waits for the customer STK. Local
           payment stays PENDING until Definite replies that the note is approved
           (no StarServe webhook — Safaricom callbacks Definite, not us).
-        - BIRDVIEW: local STK PENDING until webhook; Definite wallet settle happens at cert
+        - MPESA: Daraja STK PENDING until webhook; Definite wallet settle at cert
+        - BIRDVIEW: legacy BirdView STK (staff / rollback only)
 
         When ``generate_certificate`` is False (issuance wizard), certificate issuance
         is owned by ``IssuanceService.pay`` so Definite cannot fire twice in one request.
@@ -310,7 +311,7 @@ class PaymentService:
         plan = resolve_settlement_plan(body.method)
         method = plan.rail.value
         if self.ctx.is_guest and method not in GUEST_ALLOWED_RAILS:
-            raise ValidationAppError("Guest payments must use BirdView M-Pesa")
+            raise ValidationAppError("Guest payments must use M-Pesa (Daraja)")
         if plan.required_permission:
             self.ctx.require_permission(plan.required_permission)
         if plan.requires_phone and not (body.phone or "").strip():
@@ -491,7 +492,7 @@ class PaymentService:
         # Definite wallet/M-Pesa rails cannot skim an agency fee, so they charge gross.
         referral_cost = Decimal("0.00")
         discount = Decimal("0.00")
-        if method == PaymentMethod.BIRDVIEW.value:
+        if method in {PaymentMethod.BIRDVIEW.value, PaymentMethod.MPESA.value}:
             referral_cost = monthly_referral_cost(
                 await resolve_cover_period(self.session, self.ctx, policy)
             )

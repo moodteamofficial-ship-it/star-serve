@@ -11,7 +11,7 @@ class PaymentInitiateRequest(BaseModel):
     policy_id: UUID
     # Default onto the customer-funded rail that stays PENDING until confirmed.
     # An omitted or unknown method must never settle a payment on its own.
-    method: str = Field(default="BIRDVIEW", max_length=32)
+    method: str = Field(default="MPESA", max_length=32)
     phone: str | None = Field(default=None, max_length=32)
     # Intentionally no amount — server loads policy.gross_premium
 

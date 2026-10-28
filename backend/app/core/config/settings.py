@@ -131,7 +131,10 @@ class Settings(BaseSettings):
     mpesa_passkey: str = ""
     mpesa_webhook_secret: str = ""
     mpesa_callback_base_url: str = "http://localhost:8000"
-    # Optional Daraja source IPs / CIDRs. Empty = signature-only (no source check).
+    mpesa_daraja_base_url: str = "https://api.safaricom.co.ke"
+    mpesa_live: bool = True
+    mpesa_timeout_seconds: int = 30
+    # Optional Daraja source IPs / CIDRs. Empty = checkout binding only.
     mpesa_callback_allowed_ips: str = ""
 
     # BirdView STK (alternate M-Pesa rail for certificate premiums)

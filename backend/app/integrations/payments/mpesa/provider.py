@@ -1,7 +1,9 @@
-"""M-Pesa STK-style provider — local stub + webhook signature verification.
+"""M-Pesa STK via Safaricom Daraja (Lipa na M-Pesa Online).
 
-Real Safaricom Daraja credentials are configured via env; without them the
-stub completes STK initiation as PENDING and accepts signed local webhooks.
+Credentials: MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET, MPESA_SHORTCODE,
+MPESA_PASSKEY. Callback: ``POST …/webhooks/payments/mpesa`` (Safaricom JSON).
+
+Local/dev without credentials uses a signed stub webhook (tests).
 """
 
 from __future__ import annotations
@@ -15,11 +17,14 @@ from uuid import uuid4
 
 from app.core.config import Settings, get_settings
 from app.core.exceptions import AuthenticationError, ValidationAppError
+from app.integrations.payments.mpesa.callback_parse import parse_daraja_stk_callback
+from app.integrations.payments.mpesa.daraja_client import DarajaClient
 from app.integrations.payments.ports import (
     PaymentInitResult,
     PaymentProvider,
     WebhookVerificationResult,
 )
+from app.modules.payments.dev_charge import resolve_outbound_charge_kes
 
 
 class MpesaProvider(PaymentProvider):
@@ -27,6 +32,16 @@ class MpesaProvider(PaymentProvider):
 
     def __init__(self, settings: Settings | None = None) -> None:
         self.settings = settings or get_settings()
+
+    def _live_daraja(self) -> bool:
+        if not getattr(self.settings, "mpesa_live", True):
+            return False
+        return bool(
+            (self.settings.mpesa_consumer_key or "").strip()
+            and (self.settings.mpesa_consumer_secret or "").strip()
+            and (self.settings.mpesa_shortcode or "").strip()
+            and (self.settings.mpesa_passkey or "").strip()
+        )
 
     async def initiate(
         self,
@@ -41,21 +56,53 @@ class MpesaProvider(PaymentProvider):
             raise ValidationAppError("M-Pesa currently supports KES only")
         if not phone:
             raise ValidationAppError("Phone number is required for M-Pesa payments")
-        if self.settings.is_production and not (self.settings.mpesa_consumer_key or "").strip():
-            raise ValidationAppError("M-Pesa is not configured for this environment")
-        checkout_id = f"ws_CO_{uuid4().hex[:16]}"
-        # Production would call Safaricom STK Push here with timeouts / no blind retries
+        if self.settings.is_production and not self._live_daraja():
+            raise ValidationAppError("M-Pesa Daraja is not configured for this environment")
+
+        charge = resolve_outbound_charge_kes(self.settings, amount)
+
+        if not self._live_daraja():
+            checkout_id = f"ws_CO_{uuid4().hex[:16]}"
+            return PaymentInitResult(
+                provider_checkout_id=checkout_id,
+                status="PENDING",
+                raw={
+                    "MerchantRequestID": f"mr_{uuid4().hex[:10]}",
+                    "CheckoutRequestID": checkout_id,
+                    "ResponseCode": "0",
+                    "CustomerMessage": "Success. Request accepted for processing",
+                    "mode": "STUB",
+                    "stk_amount": str(charge.quantize(Decimal("0.01"))),
+                    "Amount": str(charge),
+                    "Phone": phone,
+                    "AccountReference": reference,
+                },
+            )
+
+        client = DarajaClient(self.settings)
+        try:
+            raw = await client.stk_push(
+                phone=phone,
+                amount=charge,
+                account_reference=reference,
+                transaction_desc=str(metadata.get("policy_number") or "StarServe")[:13],
+            )
+        finally:
+            await client.aclose()
+
+        checkout_id = str(
+            raw.get("CheckoutRequestID") or raw.get("checkoutRequestID") or ""
+        ).strip()
+        if not checkout_id:
+            raise ValidationAppError("M-Pesa STK Push did not return CheckoutRequestID")
+
         return PaymentInitResult(
             provider_checkout_id=checkout_id,
             status="PENDING",
             raw={
-                "MerchantRequestID": f"mr_{uuid4().hex[:10]}",
-                "CheckoutRequestID": checkout_id,
-                "ResponseCode": "0",
-                "CustomerMessage": "Success. Request accepted for processing",
-                "mode": "STUB" if not self.settings.mpesa_consumer_key else "LIVE_CONFIGURED",
-                "Amount": str(amount),
-                "Phone": phone,
+                **raw,
+                "mode": "DARAJA",
+                "stk_amount": str(charge.quantize(Decimal("0.01"))),
                 "AccountReference": reference,
             },
         )
@@ -66,6 +113,29 @@ class MpesaProvider(PaymentProvider):
         headers: dict[str, str],
         payload: dict[str, Any],
     ) -> WebhookVerificationResult:
+        if payload.get("Body") or payload.get("stkCallback"):
+            flat = parse_daraja_stk_callback(payload)
+            result_code = str(flat.get("ResultCode", "1"))
+            success = result_code in {"0", "00000000"}
+            amount_raw = flat.get("Amount")
+            amount = Decimal(str(amount_raw)) if amount_raw not in (None, "") else None
+            checkout = str(flat.get("CheckoutRequestID") or "").strip()
+            reference = str(flat.get("AccountReference") or "").strip()
+            return WebhookVerificationResult(
+                valid=True,
+                reference=reference,
+                checkout_id=checkout,
+                receipt=str(flat.get("MpesaReceiptNumber") or "") or None,
+                amount=amount,
+                currency="KES",
+                success=success,
+                failure_code=None if success else result_code,
+                failure_message=None if success else str(flat.get("ResultDesc") or "Payment failed"),
+                raw=payload,
+                outcome_authenticated=True,
+                identity_kind="checkout",
+            )
+
         secret = (self.settings.mpesa_webhook_secret or "").strip()
         if not secret:
             raise AuthenticationError("M-Pesa webhook secret is not configured")

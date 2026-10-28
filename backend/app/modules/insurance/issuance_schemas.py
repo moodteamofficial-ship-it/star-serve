@@ -64,7 +64,7 @@ class IssuancePayCancelRequest(BaseModel):
 
 class IssuancePayRequest(BaseModel):
     policy_id: str
-    method: str = Field(default="BIRDVIEW", max_length=32)
+    method: str = Field(default="MPESA", max_length=32)
     phone: str | None = Field(default=None, max_length=32)
 
     model_config = {"extra": "forbid"}

@@ -316,8 +316,8 @@ export function QuoteWizardPage({
   const [submitResult, setSubmitResult] = useState<IssuanceSubmitResult | null>(null);
   const [payResult, setPayResult] = useState<IssuancePayResult | null>(null);
   const [payMethod, setPayMethod] = useState<
-    "DEFINITE_WALLET" | "DEFINITE_MPESA" | "BIRDVIEW"
-  >("BIRDVIEW");
+    "DEFINITE_WALLET" | "DEFINITE_MPESA" | "MPESA" | "BIRDVIEW"
+  >("MPESA");
   const [referralCode, setReferralCode] = useState("");
   const [pendingReferralCode, setPendingReferralCode] = useState<string | null>(null);
   const [guestSessionReady, setGuestSessionReady] = useState(!guest);
@@ -945,7 +945,7 @@ export function QuoteWizardPage({
           policy_id: submitResult.policy.id,
           method: payMethod,
           phone:
-            payMethod === "DEFINITE_MPESA" || payMethod === "BIRDVIEW"
+            payMethod === "DEFINITE_MPESA" || payMethod === "MPESA" || payMethod === "BIRDVIEW"
               ? toE164(mpesaCountry, mpesaPhone) || toE164(phoneCountry, phone) || undefined
               : undefined,
         }, guest)
@@ -1059,7 +1059,7 @@ export function QuoteWizardPage({
         setMpesaMessage(
           attempt < 2
             ? "Waiting for payment confirmation…"
-            : payMethod === "BIRDVIEW"
+            : payMethod === "MPESA" || payMethod === "BIRDVIEW"
               ? "Still waiting for BirdView to confirm the payment…"
               : "Still waiting for Definite to confirm the payment…",
         );
@@ -1269,7 +1269,8 @@ export function QuoteWizardPage({
     }
 
     const method =
-      (payResult?.payment?.method as "DEFINITE_MPESA" | "BIRDVIEW" | undefined) ?? payMethod;
+      (payResult?.payment?.method as "DEFINITE_MPESA" | "MPESA" | "BIRDVIEW" | undefined) ??
+      payMethod;
     const payPhone =
       toE164(mpesaCountry, mpesaPhone) || toE164(phoneCountry, phone) || undefined;
 
@@ -1514,9 +1515,9 @@ export function QuoteWizardPage({
     const docsSteps: PayTrackStep[] = KYC_DOCS_ENABLED ? [docsStep] : [];
     const docsUpcoming: PayTrackStep[] = docsSteps.map((s) => ({ ...s, status: "upcoming" }));
 
-    if (payMethod === "DEFINITE_MPESA" || payMethod === "BIRDVIEW") {
+    if (payMethod === "DEFINITE_MPESA" || payMethod === "MPESA" || payMethod === "BIRDVIEW") {
       const railLabel =
-        payMethod === "BIRDVIEW"
+        payMethod === "MPESA" || payMethod === "BIRDVIEW"
           ? "BirdView"
           : payMethod === "DEFINITE_MPESA"
             ? "Definite M-Pesa"
@@ -1707,7 +1708,7 @@ export function QuoteWizardPage({
     if (mpesaWait === "failed" || payIssuance.isError) return "Payment interrupted";
     if (mpesaWait === "finishing") return "Issuing certificate";
     if (mpesaWait === "waiting") {
-      return payMethod === "BIRDVIEW" || payMethod === "DEFINITE_MPESA"
+      return payMethod === "MPESA" || payMethod === "BIRDVIEW" || payMethod === "DEFINITE_MPESA"
         ? "Waiting for payment"
         : "Processing payment";
     }
@@ -1829,11 +1830,12 @@ export function QuoteWizardPage({
     submitResult?.referral?.referral_cost ?? (isMonthlyPeriod ? 50 : 0),
   );
   const referralDiscount =
-    payMethod === "BIRDVIEW" ? Number(submitResult?.referral?.discount ?? 0) : 0;
+    payMethod === "MPESA" || payMethod === "BIRDVIEW" ? Number(submitResult?.referral?.discount ?? 0) : 0;
   const amountDue =
-    payMethod === "BIRDVIEW" && submitResult?.referral?.amount_payable != null
+    (payMethod === "MPESA" || payMethod === "BIRDVIEW") &&
+    submitResult?.referral?.amount_payable != null
       ? submitResult.referral.amount_payable
-      : payMethod === "BIRDVIEW"
+      : payMethod === "MPESA" || payMethod === "BIRDVIEW"
         ? definiteTotal + referralCost - referralDiscount
         : definiteTotal ||
           submitResult?.provider?.amount_to_pay ||
@@ -2793,7 +2795,7 @@ export function QuoteWizardPage({
                 <div className="pay-progress-meta">
                   <div>
                     <p className="quote-selection-label">
-                      {payMethod === "BIRDVIEW"
+                      {payMethod === "MPESA" || payMethod === "BIRDVIEW"
                         ? "BirdView"
                         : payMethod === "DEFINITE_MPESA"
                           ? "Definite M-Pesa"
@@ -2960,12 +2962,12 @@ export function QuoteWizardPage({
                       <p className="pay-progress-footnote">
                         {mpesaWait === "waiting"
                           ? guest
-                            ? payMethod === "BIRDVIEW"
+                            ? payMethod === "MPESA" || payMethod === "BIRDVIEW"
                               ? "Approve the prompt on your phone. This page updates when BirdView confirms the payment."
                               : "Approve the prompt on your phone. This page updates when Definite confirms the payment."
                             : canReconcileReceipt
                               ? "Approve the prompt on your phone. If you already paid, enter the M-Pesa receipt from your SMS."
-                              : payMethod === "BIRDVIEW"
+                              : payMethod === "MPESA" || payMethod === "BIRDVIEW"
                                 ? "Approve the prompt on your phone. This page updates when BirdView confirms the payment."
                                 : "Approve the prompt on your phone. This page updates when Definite confirms the payment."
                           : "Please wait. This usually takes a few seconds."}
@@ -3023,7 +3025,7 @@ export function QuoteWizardPage({
                       ? ` · ${submitResult.policy.vehicle_registration ?? registration}`
                       : ""}
                   </span>
-                  {payMethod === "BIRDVIEW" && referralCost > 0 ? (
+                  {(payMethod === "MPESA" || payMethod === "BIRDVIEW") && referralCost > 0 ? (
                     <span className="quote-referral-credit">
                       Includes KES {money(referralCost)} monthly referral cost
                     </span>
@@ -3219,13 +3221,14 @@ export function QuoteWizardPage({
                     label="Payment method"
                     value={payMethod}
                     onChange={(next) =>
-                      setPayMethod(next as "DEFINITE_WALLET" | "DEFINITE_MPESA" | "BIRDVIEW")
+                      setPayMethod(next as "DEFINITE_WALLET" | "DEFINITE_MPESA" | "MPESA" | "BIRDVIEW")
                     }
                     options={
                       guest
-                        ? [{ value: "BIRDVIEW", label: "BirdView M-Pesa Push" }]
+                        ? [{ value: "MPESA", label: "M-Pesa (Safaricom)" }]
                         : [
-                            { value: "BIRDVIEW", label: "BirdView M-Pesa Push" },
+                            { value: "MPESA", label: "M-Pesa (Safaricom Daraja)" },
+                            { value: "BIRDVIEW", label: "BirdView M-Pesa (legacy)" },
                             { value: "DEFINITE_MPESA", label: "Definite M-Pesa Push" },
                             ...(canPayFromFloat
                               ? [
@@ -3238,11 +3241,11 @@ export function QuoteWizardPage({
                           ]
                     }
                   />
-                  {payMethod === "DEFINITE_MPESA" || payMethod === "BIRDVIEW" ? (
+                  {payMethod === "DEFINITE_MPESA" || payMethod === "MPESA" || payMethod === "BIRDVIEW" ? (
                     <PhoneField
                       label={
-                        payMethod === "BIRDVIEW"
-                          ? "BirdView phone"
+                        payMethod === "MPESA" || payMethod === "BIRDVIEW"
+                          ? "M-Pesa phone"
                           : "Definite M-Pesa phone"
                       }
                       value={mpesaPhone}
