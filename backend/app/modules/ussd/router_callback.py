@@ -178,7 +178,10 @@ async def ussd_callback(
         await db.commit()
         return adapter.render(text=result.text, response_type=result.response_type)
     except Exception:
-        await db.rollback()
+        try:
+            await db.rollback()
+        except Exception:
+            logger.warning("ussd_callback_rollback_failed", exc_info=True)
         logger.exception("ussd_callback_failed")
         return _safe_end(adapter)
 
