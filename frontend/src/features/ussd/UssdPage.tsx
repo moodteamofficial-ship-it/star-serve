@@ -1477,6 +1477,8 @@ function ProviderPanel() {
     setHydrated(true);
   }, [query.data, hydrated]);
 
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+
   const save = useMutation({
     mutationFn: () =>
       ussdApi.updateProvider({
@@ -1488,8 +1490,12 @@ function ProviderPanel() {
     onSuccess: async () => {
       setSecret("");
       setHydrated(false);
+      setSaveMessage("Provider settings saved.");
       await qc.invalidateQueries({ queryKey: ["ussd-provider"] });
       await qc.invalidateQueries({ queryKey: ["ussd-audit"] });
+    },
+    onError: (error) => {
+      setSaveMessage(errMessage(error));
     },
   });
 
@@ -1525,6 +1531,12 @@ function ProviderPanel() {
         {query.error ? (
           <p className="customers-empty-copy" role="alert">
             {errMessage(query.error)}
+          </p>
+        ) : null}
+
+        {saveMessage ? (
+          <p className="customers-empty-copy" role={save.isError ? "alert" : "status"}>
+            {saveMessage}
           </p>
         ) : null}
 
@@ -1584,7 +1596,8 @@ function ProviderPanel() {
 
             <p className="ussd-help">
               Birdview calls this URL with SESSIONID, MSISDN, USSDCODE and INPUT (latest input only).
-              Responses are plain text starting with CON or END, always HTTP 200.
+              Responses are plain text starting with CON or END, always HTTP 200. Callback secret is
+              optional for Birdview — leave unset unless Birdview gave you a shared header secret.
             </p>
           </>
         ) : null}

@@ -20,12 +20,14 @@ from app.core.database.rls import set_rls_context
 from app.core.dependencies.auth import get_db
 from app.core.logging import get_logger
 from app.modules.insurance.guest_session import resolve_guest_tenant_id
-from app.modules.ussd.engine import UssdEngine, resolve_provider
-from app.modules.ussd.enums import UssdProviderKind
+from app.modules.ussd.engine import UssdEngine, ensure_published_config, resolve_provider
+from app.modules.ussd.enums import UssdProviderKind, UssdResponseType
+from app.modules.ussd.seed import default_menu_definition, render_menu_text
 from app.modules.ussd.models import UssdProviderSetting
 from app.modules.ussd.providers import get_adapter
 from app.modules.ussd.providers.birdview import (
     BirdviewAdapter,
+    extract_birdview_params,
     looks_like_birdview,
     normalize_ussd_code,
 )
@@ -43,6 +45,22 @@ class _AuthView:
         self.auth_header_name = (row.auth_header_name if row else None) or "X-USSD-Secret"
         self.allowed_ips = list(row.allowed_ips or []) if row else []
         self.allow_unauthenticated = allow_unauthenticated
+
+
+async def _welcome_con(
+    db: AsyncSession,
+    *,
+    tenant_id: UUID,
+    adapter: Any,
+) -> Response:
+    """HTTP 200 CON welcome — used when Birdview params are absent (URL checks)."""
+    await set_rls_context(db, tenant_id=tenant_id, is_platform_admin=False)
+    config = await ensure_published_config(db, tenant_id)
+    definition = config.definition or default_menu_definition()
+    screens = definition.get("screens") or {}
+    screen = screens.get(config.root_screen_key) or screens.get("main") or {}
+    text = render_menu_text(screen, max_chars=int(config.max_message_chars or 160))
+    return adapter.render(text=text, response_type=UssdResponseType.CONTINUE.value)
 
 
 def _safe_end(adapter: Any, message: str = _UNAVAILABLE) -> Response:
@@ -127,6 +145,23 @@ async def ussd_callback(
             )
         )
         adapter = get_adapter(kind)
+
+        params = extract_birdview_params(request, body_bytes or None)
+        if kind == UssdProviderKind.BIRDVIEW.value and not (
+            params.get("SESSIONID") and params.get("MSISDN")
+        ):
+            if provider_row is not None:
+                tenant_id = UUID(str(provider_row.tenant_id))
+            else:
+                tenant_id = await resolve_guest_tenant_id(db)
+            try:
+                response = await _welcome_con(db, tenant_id=tenant_id, adapter=adapter)
+                await db.commit()
+                return response
+            except Exception:
+                await db.rollback()
+                logger.exception("ussd_callback_welcome_preview_failed")
+                return _safe_end(adapter)
 
         allow_unauth = (not settings.is_production) or bool(
             getattr(settings, "ussd_allow_unauthenticated", False)
