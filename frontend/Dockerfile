@@ -15,8 +15,8 @@ COPY src ./src
 # Relative /api/v1 — nginx proxies to the API (same-origin cookies).
 # VITE_BASE_PATH=/dashboard/ for Render custom-domain mount; default / for Cloud Run.
 ARG VITE_APP_NAME="Star Serve"
-ARG VITE_DEFAULT_API_ENV=staging
-ARG VITE_BASE_PATH=/
+ARG VITE_DEFAULT_API_ENV=production
+ARG VITE_BASE_PATH=/dashboard/
 ARG VITE_API_BASE_URL=/api/v1
 ARG VITE_API_URL_DEVELOPMENT=/api/v1
 ARG VITE_API_URL_STAGING=/api/v1

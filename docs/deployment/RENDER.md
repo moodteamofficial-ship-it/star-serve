@@ -6,10 +6,10 @@ services. You do **not** need Cloud Run or GCP billing for the API if you use
 
 | Service | Typical deploy | Health |
 |---------|----------------|--------|
-| SPA (`starserve-dashboard`) | Existing GAR image or Git `v1.0/frontend` | `/ready` |
-| API (`starserve-api`) | Docker Hub / GHCR / Git `v1.0/backend` | `/health` |
+| SPA (`starserve-dashboard`) | Git `frontend/` (Docker) on `moodteamofficial-ship-it/star-serve` | `/ready` |
+| API (`starserve-api`) | Git `backend/` or Docker Hub / GHCR | `/health` |
 
-Cloud Run `*.run.app` remains **rollback** only for the dashboard nginx proxy.
+Do **not** use GAR `web:render` on Render — GCP billing blocks image pulls. Same-origin `/api/v1` is proxied by nginx to `API_UPSTREAM`.
 
 ## Full stack on Render (frontend + backend)
 

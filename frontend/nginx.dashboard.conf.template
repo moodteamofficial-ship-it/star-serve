@@ -91,6 +91,30 @@ http {
     }
 
     # Trailing-slash normalize — relative Location (no :8080).
+    # Vite dist uses /dashboard/assets when built with VITE_BASE_PATH=/dashboard/.
+    # Older images used base / — serve the same files at /assets/ so the SPA loads.
+    location /assets/ {
+      alias /usr/share/nginx/html/assets/;
+      add_header Cache-Control "public, max-age=31536000, immutable" always;
+      add_header X-Frame-Options "DENY" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      access_log off;
+    }
+
+    location /fonts/ {
+      alias /usr/share/nginx/html/fonts/;
+      add_header Cache-Control "public, max-age=2592000" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      access_log off;
+    }
+
+    location ~ ^/(?<root_static>[^/]+\.(png|svg|ico|webp|jpe?g|gif|webmanifest|txt))$ {
+      alias /usr/share/nginx/html/$root_static;
+      add_header Cache-Control "public, max-age=86400" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      access_log off;
+    }
+
     location = /dashboard {
       return 302 /dashboard/;
     }
