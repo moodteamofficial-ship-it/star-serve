@@ -36,12 +36,10 @@ class GenericFormAdapter:
         provided = (request.headers.get(header_name) or "").strip()
         if not provided or not hmac.compare_digest(provided, expected):
             raise AuthenticationError("Invalid USSD provider credentials")
-        from app.core.security.request import client_ip, ip_in_allowlist
-
-        allowed = [str(x).strip() for x in (getattr(settings, "allowed_ips", None) or []) if str(x).strip()]
+        allowed = list(getattr(settings, "allowed_ips", None) or [])
         if allowed:
-            ip = client_ip(request)
-            if not ip or not ip_in_allowlist(ip, ",".join(allowed)):
+            client = request.client.host if request.client else ""
+            if client not in allowed:
                 raise AuthenticationError("USSD callback IP is not allowed")
 
     async def parse(self, request: Request) -> ProviderCallback:

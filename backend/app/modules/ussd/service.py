@@ -229,10 +229,7 @@ class UssdAdminService:
                 raise ValidationAppError("Unsupported provider kind")
             row.provider_kind = kind
         if "service_code" in body and body["service_code"]:
-            from app.modules.ussd.providers.birdview import normalize_ussd_code
-
-            normalized = normalize_ussd_code(str(body["service_code"]))
-            row.service_code = (normalized or str(body["service_code"]).strip())[:32]
+            row.service_code = str(body["service_code"])[:32]
         if "enabled" in body:
             row.enabled = bool(body["enabled"])
         if "auth_header_name" in body:

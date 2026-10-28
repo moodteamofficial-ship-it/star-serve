@@ -22,7 +22,6 @@ from urllib.parse import parse_qs
 from fastapi import Response
 from starlette.requests import Request
 
-from app.core.security.request import client_ip, ip_in_allowlist
 from app.modules.ussd.enums import UssdProviderKind, UssdResponseType
 from app.modules.ussd.providers.base import ProviderCallback
 
@@ -98,10 +97,10 @@ class BirdviewAdapter:
 
     async def authenticate(self, request: Request, settings: Any) -> None:
         """Optional shared secret / IP allowlist. Unset secret = open HTTPS callback."""
-        allowed = [str(x).strip() for x in (getattr(settings, "allowed_ips", None) or []) if str(x).strip()]
+        allowed = list(getattr(settings, "allowed_ips", None) or [])
         if allowed:
-            ip = client_ip(request)
-            if not ip or not ip_in_allowlist(ip, ",".join(allowed)):
+            client = request.client.host if request.client else ""
+            if client not in allowed:
                 raise PermissionError("USSD callback IP is not allowed")
 
         expected = (getattr(settings, "auth_secret", None) or "").strip()
