@@ -147,6 +147,19 @@ Paste the output into Render → Environment. Set secret variables from the same
 values as `scripts/gcp/sync-secrets.sh production` / Secret Manager
 `starserve-prod-*` (never commit them).
 
+To **rotate** CSRF / encryption / guest signing / webhook secrets and generate a
+production JWT pair into `backend/secrets/prod_jwt_*.pem`:
+
+```bash
+./scripts/gcp/rotate-production-secrets.sh          # updates .env + Secret Manager when billing is on
+UPLOAD_GCP=false ./scripts/gcp/rotate-production-secrets.sh   # .env only (Render path)
+export RENDER_API_KEY=rnd_...
+SKIP_DASHBOARD_CUTOVER=true ./scripts/render/apply-production.sh
+```
+
+**Note:** A new `ENCRYPTION_KEY` cannot decrypt DB fields encrypted with the old
+key. A new JWT pair logs everyone out; new guest signing invalidates open guest links.
+
 ### GCS (certificates, PDFs, uploads)
 
 Cloud Run used the runtime service account. On Render:
