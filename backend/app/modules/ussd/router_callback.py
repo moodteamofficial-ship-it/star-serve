@@ -20,9 +20,8 @@ from app.core.database.rls import set_rls_context
 from app.core.dependencies.auth import get_db
 from app.core.logging import get_logger
 from app.modules.insurance.guest_session import resolve_guest_tenant_id
-from app.modules.ussd.engine import UssdEngine, ensure_published_config, resolve_provider
-from app.modules.ussd.enums import UssdProviderKind, UssdResponseType
-from app.modules.ussd.seed import default_menu_definition, render_menu_text
+from app.modules.ussd.engine import UssdEngine, resolve_provider
+from app.modules.ussd.enums import UssdProviderKind
 from app.modules.ussd.models import UssdProviderSetting
 from app.modules.ussd.providers import get_adapter
 from app.modules.ussd.providers.birdview import (
@@ -30,6 +29,13 @@ from app.modules.ussd.providers.birdview import (
     extract_birdview_params,
     looks_like_birdview,
     normalize_ussd_code,
+)
+
+_BARE_URL_WELCOME = (
+    "Welcome to StarServe Insurance\n"
+    "1. Motor Insurance Cover\n"
+    "2. Report a Claim\n"
+    "3. Follow Up a Claim"
 )
 
 logger = get_logger(__name__)
@@ -45,33 +51,6 @@ class _AuthView:
         self.auth_header_name = (row.auth_header_name if row else None) or "X-USSD-Secret"
         self.allowed_ips = list(row.allowed_ips or []) if row else []
         self.allow_unauthenticated = allow_unauthenticated
-
-
-def _static_welcome_text() -> str:
-    definition = default_menu_definition()
-    screens = definition.get("screens") or {}
-    screen = screens.get("main") or {}
-    return render_menu_text(screen, max_chars=160)
-
-
-async def _welcome_con(
-    db: AsyncSession,
-    *,
-    tenant_id: UUID,
-    adapter: Any,
-) -> Response:
-    """HTTP 200 CON welcome — used when Birdview params are absent (URL checks)."""
-    try:
-        await set_rls_context(db, tenant_id=tenant_id, is_platform_admin=False)
-        config = await ensure_published_config(db, tenant_id)
-        definition = config.definition or default_menu_definition()
-        screens = definition.get("screens") or {}
-        screen = screens.get(config.root_screen_key) or screens.get("main") or {}
-        text = render_menu_text(screen, max_chars=int(config.max_message_chars or 160))
-    except Exception:
-        logger.warning("ussd_callback_welcome_db_fallback", exc_info=True)
-        text = _static_welcome_text()
-    return adapter.render(text=text, response_type=UssdResponseType.CONTINUE.value)
 
 
 def _safe_end(adapter: Any, message: str = _UNAVAILABLE) -> Response:
@@ -94,21 +73,12 @@ async def ussd_callback(
     if not getattr(settings, "ussd_enabled", True):
         return _safe_end(adapter)
 
-    body_bytes = b""
     if request.method.upper() == "GET":
         probe = extract_birdview_params(request, None)
         if not (probe.get("SESSIONID") and probe.get("MSISDN")):
-            welcome = _static_welcome_text().strip() or (
-                "Welcome to StarServe Insurance\n"
-                "1. Motor Insurance Cover\n"
-                "2. Report a Claim\n"
-                "3. Follow Up a Claim"
-            )
-            return adapter.render(
-                text=welcome,
-                response_type=UssdResponseType.CONTINUE.value,
-            )
+            return adapter.render(text=_BARE_URL_WELCOME, response_type="CONTINUE")
 
+    body_bytes = b""
     try:
         if request.method.upper() == "POST":
             body_bytes = await request.body()
@@ -170,30 +140,6 @@ async def ussd_callback(
             )
         )
         adapter = get_adapter(kind)
-
-        params = extract_birdview_params(request, body_bytes or None)
-        if request.method.upper() == "GET" and not (
-            params.get("SESSIONID") and params.get("MSISDN")
-        ):
-            preview_adapter = get_adapter(UssdProviderKind.BIRDVIEW.value)
-            if provider_row is not None:
-                try:
-                    tenant_id = UUID(str(provider_row.tenant_id))
-                    response = await _welcome_con(
-                        db, tenant_id=tenant_id, adapter=preview_adapter
-                    )
-                    try:
-                        await db.commit()
-                    except Exception:
-                        await db.rollback()
-                    return response
-                except Exception:
-                    await db.rollback()
-                    logger.exception("ussd_callback_welcome_preview_failed")
-            return preview_adapter.render(
-                text=_static_welcome_text(),
-                response_type=UssdResponseType.CONTINUE.value,
-            )
 
         allow_unauth = (not settings.is_production) or bool(
             getattr(settings, "ussd_allow_unauthenticated", False)
