@@ -47,6 +47,13 @@ class _AuthView:
         self.allow_unauthenticated = allow_unauthenticated
 
 
+def _static_welcome_text() -> str:
+    definition = default_menu_definition()
+    screens = definition.get("screens") or {}
+    screen = screens.get("main") or {}
+    return render_menu_text(screen, max_chars=160)
+
+
 async def _welcome_con(
     db: AsyncSession,
     *,
@@ -54,12 +61,16 @@ async def _welcome_con(
     adapter: Any,
 ) -> Response:
     """HTTP 200 CON welcome — used when Birdview params are absent (URL checks)."""
-    await set_rls_context(db, tenant_id=tenant_id, is_platform_admin=False)
-    config = await ensure_published_config(db, tenant_id)
-    definition = config.definition or default_menu_definition()
-    screens = definition.get("screens") or {}
-    screen = screens.get(config.root_screen_key) or screens.get("main") or {}
-    text = render_menu_text(screen, max_chars=int(config.max_message_chars or 160))
+    try:
+        await set_rls_context(db, tenant_id=tenant_id, is_platform_admin=False)
+        config = await ensure_published_config(db, tenant_id)
+        definition = config.definition or default_menu_definition()
+        screens = definition.get("screens") or {}
+        screen = screens.get(config.root_screen_key) or screens.get("main") or {}
+        text = render_menu_text(screen, max_chars=int(config.max_message_chars or 160))
+    except Exception:
+        logger.warning("ussd_callback_welcome_db_fallback", exc_info=True)
+        text = _static_welcome_text()
     return adapter.render(text=text, response_type=UssdResponseType.CONTINUE.value)
 
 
@@ -152,19 +163,23 @@ async def ussd_callback(
         ):
             preview_adapter = get_adapter(UssdProviderKind.BIRDVIEW.value)
             if provider_row is not None:
-                tenant_id = UUID(str(provider_row.tenant_id))
-            else:
-                tenant_id = await resolve_guest_tenant_id(db)
-            try:
-                response = await _welcome_con(
-                    db, tenant_id=tenant_id, adapter=preview_adapter
-                )
-                await db.commit()
-                return response
-            except Exception:
-                await db.rollback()
-                logger.exception("ussd_callback_welcome_preview_failed")
-                return _safe_end(preview_adapter)
+                try:
+                    tenant_id = UUID(str(provider_row.tenant_id))
+                    response = await _welcome_con(
+                        db, tenant_id=tenant_id, adapter=preview_adapter
+                    )
+                    try:
+                        await db.commit()
+                    except Exception:
+                        await db.rollback()
+                    return response
+                except Exception:
+                    await db.rollback()
+                    logger.exception("ussd_callback_welcome_preview_failed")
+            return preview_adapter.render(
+                text=_static_welcome_text(),
+                response_type=UssdResponseType.CONTINUE.value,
+            )
 
         allow_unauth = (not settings.is_production) or bool(
             getattr(settings, "ussd_allow_unauthenticated", False)
