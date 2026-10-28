@@ -147,21 +147,24 @@ async def ussd_callback(
         adapter = get_adapter(kind)
 
         params = extract_birdview_params(request, body_bytes or None)
-        if kind == UssdProviderKind.BIRDVIEW.value and not (
+        if request.method.upper() == "GET" and not (
             params.get("SESSIONID") and params.get("MSISDN")
         ):
+            preview_adapter = get_adapter(UssdProviderKind.BIRDVIEW.value)
             if provider_row is not None:
                 tenant_id = UUID(str(provider_row.tenant_id))
             else:
                 tenant_id = await resolve_guest_tenant_id(db)
             try:
-                response = await _welcome_con(db, tenant_id=tenant_id, adapter=adapter)
+                response = await _welcome_con(
+                    db, tenant_id=tenant_id, adapter=preview_adapter
+                )
                 await db.commit()
                 return response
             except Exception:
                 await db.rollback()
                 logger.exception("ussd_callback_welcome_preview_failed")
-                return _safe_end(adapter)
+                return _safe_end(preview_adapter)
 
         allow_unauth = (not settings.is_production) or bool(
             getattr(settings, "ussd_allow_unauthenticated", False)
