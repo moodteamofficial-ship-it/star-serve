@@ -1,41 +1,79 @@
-# Render Blueprint reference — create services in the dashboard if you prefer UI.
-# Private Artifact Registry credentials are configured per service in Render.
+# Render Blueprint — starserve-api (repo root = v1.0 on GitHub).
+# Optional: New → Blueprint after connecting https://github.com/moodteamofficial-ship-it/star-serve
 #
-# Production: API + SPA both on Render; SPA nginx proxies /api/v1 to API_UPSTREAM.
+# Easier path: create Web Service manually, then:
+#   export RENDER_API_KEY=rnd_...
+#   ./scripts/render/sync-api-after-create.sh
 
 services:
   - type: web
     name: starserve-api
-    runtime: image
+    runtime: docker
     plan: starter
     region: frankfurt
-    image:
-      url: europe-west1-docker.pkg.dev/star-serve-508614/starserve/api:render
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /health
     envVars:
-      - key: PORT
-        value: "8000"
       - key: APP_ENV
         value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: ALLOW_INSECURE_PRODUCTION
+        value: "false"
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: COOKIE_SAMESITE
+        value: none
+      - key: TRUST_X_FORWARDED_FOR
+        value: "true"
+      - key: TRUSTED_PROXY_HOPS
+        value: "2"
       - key: STORAGE_BACKEND
         value: gcs
+      - key: GCS_BUCKET
+        value: star_serve
+      - key: GCS_PREFIX
+        value: production
       - key: GOOGLE_APPLICATION_CREDENTIALS
         value: /etc/secrets/gcs-sa.json
-      # Remaining keys: run ./scripts/render/print-production-env.sh
-      # Secrets: sync from GCP Secret Manager (starserve-prod-*)
-
-  - type: web
-    name: starserve-dashboard
-    runtime: image
-    plan: starter
-    region: frankfurt
-    image:
-      url: europe-west1-docker.pkg.dev/star-serve-508614/starserve/web:render
-    healthCheckPath: /ready
-    envVars:
-      - key: PORT
-        value: "8080"
-      - key: SPA_BASE_PATH
-        value: /dashboard
-      - key: API_UPSTREAM
-        value: starserve-api.onrender.com
+      - key: DB_PROVIDER
+        value: supabase
+      - key: SUPABASE_PROJECT_REF
+        value: wbasegyvtchdmkfkyoei
+      - key: SUPABASE_URL
+        value: https://wbasegyvtchdmkfkyoei.supabase.co
+      - key: DB_SSL_MODE
+        value: require
+      - key: DB_NULL_POOL
+        value: "true"
+      - key: DB_POOL_SIZE
+        value: "2"
+      - key: DB_MAX_OVERFLOW
+        value: "0"
+      - key: LOG_JSON
+        value: "true"
+      - key: JWT_ALGORITHM
+        value: RS256
+      - key: BIRDVIEW_LIVE
+        value: "true"
+      - key: GUEST_QUOTE_ENABLED
+        value: "true"
+      - key: EMAIL_APP_URL
+        value: https://quote.starserveinsuranceagency.com/dashboard
+      - key: BIRDVIEW_CALLBACK_BASE_URL
+        value: https://starserve-api.onrender.com
+      - key: MPESA_CALLBACK_BASE_URL
+        value: https://starserve-api.onrender.com
+      - key: EMAIL_PROVIDER
+        value: gmail
+      - key: EMAIL_SMTP_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_SMTP_PORT
+        value: "587"
+      - key: EMAIL_SMTP_USE_TLS
+        value: "true"
+      - key: CORS_ORIGINS
+        value: http://localhost:5173,http://127.0.0.1:5173,https://quote.starserveinsuranceagency.com,https://www.starserveinsuranceagency.com,https://starserveinsuranceagency.com,https://starserve-dashboard.onrender.com
+      # Secrets: run ./scripts/render/sync-api-after-create.sh (reads v1.0/.env)

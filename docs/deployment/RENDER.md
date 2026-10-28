@@ -41,7 +41,39 @@ export RENDER_GIT_REPO=https://github.com/YOURORG/starserve-v1
 ./scripts/render/deploy-render-all.sh git
 ```
 
+**Not the same as “Connections”:** Account Settings → **Connections** lists OAuth apps
+that call the Render API. Git deploys use **Git Deployment Credentials** (Account
+Settings → **Account Security** → **Git Deployment Credentials** → Add → GitHub) and
+the [Render GitHub App](https://github.com/apps/render) must include your repo under
+**Repository access** (configure at [github.com/apps/render/installations](https://github.com/apps/render/installations/new)).
+
 Then mount GCS secret file on **starserve-api** and confirm `curl https://starserve-api.onrender.com/health` → 200 and sign-in works.
+
+### Manual Web Service + one command (recommended)
+
+In Render UI, create **Web Service** only (no env typing):
+
+| UI field | Value |
+|----------|--------|
+| Name | `starserve-api` |
+| Public Git URL | `https://github.com/moodteamofficial-ship-it/star-serve` |
+| Root directory | `backend` |
+| Health check | `/health` |
+| Docker context | `.` |
+| Dockerfile | `./Dockerfile` |
+
+Leave **Environment** empty. After **Create**, on your machine:
+
+```bash
+export RENDER_API_KEY=rnd_...   # never commit
+cd v1.0
+./scripts/render/sync-api-after-create.sh
+```
+
+That applies health/Docker fixes, all plain + secret vars from `.env`, and triggers a redeploy.
+Add **Secret File** `gcs-sa.json` once in the dashboard (GCS service account JSON).
+
+Optional: repo root [`render.yaml`](../../render.yaml) Blueprint lists non-secret defaults.
 
 ## Path A — No GCP (recommended)
 
