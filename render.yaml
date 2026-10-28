@@ -1,0 +1,41 @@
+# Render Blueprint reference — create services in the dashboard if you prefer UI.
+# Private Artifact Registry credentials are configured per service in Render.
+#
+# Production: API + SPA both on Render; SPA nginx proxies /api/v1 to API_UPSTREAM.
+
+services:
+  - type: web
+    name: starserve-api
+    runtime: image
+    plan: starter
+    region: frankfurt
+    image:
+      url: europe-west1-docker.pkg.dev/star-serve-508614/starserve/api:render
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: APP_ENV
+        value: production
+      - key: STORAGE_BACKEND
+        value: gcs
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/gcs-sa.json
+      # Remaining keys: run ./scripts/render/print-production-env.sh
+      # Secrets: sync from GCP Secret Manager (starserve-prod-*)
+
+  - type: web
+    name: starserve-dashboard
+    runtime: image
+    plan: starter
+    region: frankfurt
+    image:
+      url: europe-west1-docker.pkg.dev/star-serve-508614/starserve/web:render
+    healthCheckPath: /ready
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SPA_BASE_PATH
+        value: /dashboard
+      - key: API_UPSTREAM
+        value: starserve-api.onrender.com

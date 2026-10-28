@@ -1,0 +1,111 @@
+"""USSD platform enums — menu engine, sessions, analytics, workflows."""
+
+from enum import StrEnum
+
+
+class UssdConfigStatus(StrEnum):
+    DRAFT = "DRAFT"
+    PUBLISHED = "PUBLISHED"
+    ARCHIVED = "ARCHIVED"
+
+
+class UssdScreenType(StrEnum):
+    MENU = "MENU"
+    INPUT = "INPUT"
+    CONFIRM = "CONFIRM"
+    MESSAGE = "MESSAGE"
+    WORKFLOW = "WORKFLOW"
+
+
+class UssdWorkflowAction(StrEnum):
+    """Registered workflow handlers only — never arbitrary code from the DB."""
+
+    NONE = "NONE"
+    MOTOR_QUOTE = "MOTOR_QUOTE"
+    REPORT_CLAIM = "REPORT_CLAIM"
+    FOLLOW_UP_CLAIM = "FOLLOW_UP_CLAIM"
+
+
+class UssdFieldType(StrEnum):
+    TEXT = "TEXT"
+    PHONE = "PHONE"
+    ID_NUMBER = "ID_NUMBER"
+    VEHICLE_REG = "VEHICLE_REG"
+    CLAIM_REF = "CLAIM_REF"
+    POLICY_REF = "POLICY_REF"
+    NUMBER = "NUMBER"
+    DATE = "DATE"
+    AMOUNT = "AMOUNT"
+    MENU_CHOICE = "MENU_CHOICE"
+
+
+class UssdSessionStatus(StrEnum):
+    ACTIVE = "ACTIVE"
+    COMPLETED = "COMPLETED"
+    ABANDONED = "ABANDONED"
+    TIMED_OUT = "TIMED_OUT"
+    TERMINATED = "TERMINATED"
+    FAILED = "FAILED"
+
+
+class UssdResponseType(StrEnum):
+    CONTINUE = "CONTINUE"
+    END = "END"
+
+
+class UssdEventType(StrEnum):
+    REQUEST_RECEIVED = "REQUEST_RECEIVED"
+    SESSION_STARTED = "SESSION_STARTED"
+    SESSION_RESUMED = "SESSION_RESUMED"
+    MENU_SHOWN = "MENU_SHOWN"
+    OPTION_SELECTED = "OPTION_SELECTED"
+    INPUT_RECEIVED = "INPUT_RECEIVED"
+    VALIDATION_FAILED = "VALIDATION_FAILED"
+    NAV_BACK = "NAV_BACK"
+    NAV_HOME = "NAV_HOME"
+    NAV_REPEAT = "NAV_REPEAT"
+    WORKFLOW_ENTERED = "WORKFLOW_ENTERED"
+    STEP_ENTERED = "STEP_ENTERED"
+    STEP_COMPLETED = "STEP_COMPLETED"
+    WORKFLOW_SUCCEEDED = "WORKFLOW_SUCCEEDED"
+    WORKFLOW_FAILED = "WORKFLOW_FAILED"
+    BUSINESS_REJECTED = "BUSINESS_REJECTED"
+    SESSION_COMPLETED = "SESSION_COMPLETED"
+    SESSION_ABANDONED = "SESSION_ABANDONED"
+    SESSION_TIMED_OUT = "SESSION_TIMED_OUT"
+    SESSION_TERMINATED = "SESSION_TERMINATED"
+    PROVIDER_RETRY = "PROVIDER_RETRY"
+    DUPLICATE_CALLBACK = "DUPLICATE_CALLBACK"
+    AUTH_FAILED = "AUTH_FAILED"
+    RATE_LIMITED = "RATE_LIMITED"
+    TECHNICAL_ERROR = "TECHNICAL_ERROR"
+
+
+class UssdOutcomeCategory(StrEnum):
+    SUCCESS = "SUCCESS"
+    VALIDATION_FAILURE = "VALIDATION_FAILURE"
+    BUSINESS_FAILURE = "BUSINESS_FAILURE"
+    TECHNICAL_FAILURE = "TECHNICAL_FAILURE"
+    ABANDONED = "ABANDONED"
+    TIMED_OUT = "TIMED_OUT"
+    NAVIGATION = "NAVIGATION"
+    IN_PROGRESS = "IN_PROGRESS"
+
+
+class UssdProviderKind(StrEnum):
+    """Protocol adapters for dial-in aggregators."""
+
+    SIMULATOR = "SIMULATOR"
+    BIRDVIEW = "BIRDVIEW"
+    GENERIC_FORM = "GENERIC_FORM"
+    AFRICAS_TALKING = "AFRICAS_TALKING"
+
+
+REGISTERED_WORKFLOWS = frozenset(
+    {
+        UssdWorkflowAction.MOTOR_QUOTE.value,
+        UssdWorkflowAction.REPORT_CLAIM.value,
+        UssdWorkflowAction.FOLLOW_UP_CLAIM.value,
+        UssdWorkflowAction.NONE.value,
+    }
+)

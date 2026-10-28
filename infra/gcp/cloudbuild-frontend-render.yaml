@@ -1,0 +1,30 @@
+# Build + push Star Serve SPA image for Render (/dashboard mount).
+# Does not deploy to Cloud Run.
+#
+#   gcloud builds submit --project=star-serve-508614 \
+#     --config=infra/gcp/cloudbuild-frontend-render.yaml frontend/
+substitutions:
+  _IMAGE: europe-west1-docker.pkg.dev/star-serve-508614/starserve/web:render
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+timeout: 1200s
+steps:
+  - name: gcr.io/cloud-builders/docker
+    id: build
+    args:
+      - build
+      - --build-arg=VITE_BASE_PATH=/dashboard/
+      - --build-arg=VITE_DEFAULT_API_ENV=production
+      - --build-arg=VITE_ALLOW_PRODUCTION_ENV_SWITCH=false
+      - --build-arg=VITE_WEB_URL_PRODUCTION=https://quote.starserveinsuranceagency.com/dashboard
+      - --build-arg=VITE_WEB_URL_STAGING=https://starserve-dashboard-staging-233389149626.europe-west1.run.app
+      - --tag=$_IMAGE
+      - .
+  - name: gcr.io/cloud-builders/docker
+    id: push
+    args:
+      - push
+      - $_IMAGE
+images:
+  - $_IMAGE

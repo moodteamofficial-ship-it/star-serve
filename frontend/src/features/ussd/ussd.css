@@ -1,0 +1,1487 @@
+/* USSD page — theme tokens only; shell/cards/tables come from styles.css */
+
+.ussd-page .ussd-lede {
+  margin: -0.35rem 0 1rem;
+  color: var(--ink-soft);
+  max-width: 44rem;
+}
+
+.ussd-page .customers-stat-label {
+  color: var(--ink-soft);
+}
+
+.ussd-page .customers-stat-value {
+  color: var(--ink);
+}
+
+.ussd-page .customers-stat-card {
+  background: var(--panel);
+  border-color: var(--line);
+}
+
+.ussd-panel {
+  min-height: 100%;
+}
+
+.ussd-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+
+.ussd-section-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.ussd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.ussd-help {
+  margin: 0.85rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.ussd-help code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.84em;
+  color: var(--ink);
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  padding: 0.1rem 0.35rem;
+}
+
+.ussd-insight {
+  margin: 0.85rem 0;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--brand-green-soft) 70%, var(--panel));
+  color: var(--ink);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.ussd-analytics-card .config-card-body {
+  justify-content: flex-start;
+  gap: 1.1rem;
+}
+
+.ussd-analytics-card .config-scene-header.ussd-analytics-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ussd-analytics-header-copy {
+  min-width: min(100%, 18rem);
+  flex: 1 1 16rem;
+}
+
+.ussd-analytics-header .config-scene-lead {
+  max-width: 36rem;
+}
+
+.ussd-analytics-filters.config-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(9rem, 10.5rem));
+  gap: 1rem;
+  align-items: end;
+  margin: 0 0 0 auto;
+  padding-top: 0;
+  border-top: none;
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ussd-analytics-filters.config-form > .config-field:last-child:nth-child(odd) {
+  grid-column: auto;
+}
+
+.ussd-analytics-filters .config-field {
+  margin: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.ussd-analytics-filters .ui-field-label {
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.ussd-analytics-stats {
+  margin: 0;
+}
+
+.ussd-analytics-table-block {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.ussd-analytics-table-head {
+  margin-bottom: 0;
+  align-items: baseline;
+}
+
+.ussd-analytics-table-head .ussd-section-sub {
+  margin: 0;
+}
+
+.ussd-analytics-empty {
+  padding: 2rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  text-align: center;
+  justify-items: center;
+}
+
+.ussd-sessions-card .config-card-body {
+  justify-content: flex-start;
+  gap: 1.1rem;
+}
+
+.ussd-sessions-card .config-scene-header.ussd-sessions-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ussd-sessions-header-copy {
+  min-width: min(100%, 18rem);
+  flex: 1 1 16rem;
+}
+
+.ussd-sessions-header .config-scene-lead {
+  max-width: 36rem;
+}
+
+.ussd-sessions-filters.config-form {
+  display: grid;
+  grid-template-columns: minmax(10rem, 12.5rem);
+  gap: 0.65rem;
+  margin: 0 0 0 auto;
+  padding-top: 0;
+  border-top: none;
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 100%;
+}
+
+.ussd-sessions-filters .config-field {
+  margin: 0;
+  min-width: 0;
+}
+
+.ussd-sessions-filters .ui-field-label {
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.ussd-sessions-empty {
+  padding: 2rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  text-align: center;
+  justify-items: center;
+}
+
+.ussd-sessions-table {
+  min-width: 36rem;
+}
+
+.ussd-session-row {
+  cursor: pointer;
+}
+
+.ussd-session-row:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand-green) 55%, transparent);
+  outline-offset: -2px;
+}
+
+.ussd-session-row:hover td {
+  background: color-mix(in srgb, var(--brand-green-soft) 72%, var(--panel));
+}
+
+.modal-panel.ussd-session-modal {
+  width: min(100%, 52rem);
+  max-height: min(92vh, 48rem);
+  border-radius: 0.65rem;
+}
+
+.modal-panel.ussd-session-modal .modal-header {
+  padding: 1.35rem 1.5rem 1.15rem;
+}
+
+.modal-panel.ussd-session-modal .modal-heading h2 {
+  font-size: 1.25rem;
+}
+
+.modal-panel.ussd-session-modal .modal-body.ussd-session-modal-body {
+  padding: 1.25rem 1.5rem 0.85rem;
+}
+
+.modal-panel.ussd-session-modal .modal-footer {
+  padding: 1rem 1.5rem 1.35rem;
+  gap: 0.75rem;
+}
+
+.modal-panel.ussd-session-modal .modal-footer > button {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.45rem;
+  padding: 0.55rem 1.15rem;
+  border: 0;
+  border-radius: 0.4rem;
+}
+
+.ussd-session-detail {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.ussd-session-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.ussd-session-detail-block {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.95rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--surface-muted);
+}
+
+.ussd-session-detail-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.ussd-session-detail-value {
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.ussd-session-detail-value.ussd-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.ussd-session-detail-copy {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.ussd-session-detail-message {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.ussd-session-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.ussd-session-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1rem;
+  padding: 0.15rem 0.15rem 0;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 640px) {
+  .ussd-session-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ussd-provider-card .config-card-body {
+  justify-content: flex-start;
+  gap: 1.1rem;
+}
+
+.ussd-provider-card .config-scene-header.ussd-provider-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ussd-provider-header-copy {
+  min-width: min(100%, 18rem);
+  flex: 1 1 16rem;
+}
+
+.ussd-provider-header .config-scene-lead {
+  max-width: 36rem;
+}
+
+.ussd-provider-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+}
+
+.ussd-provider-meta p {
+  margin: 0.3rem 0 0;
+  color: var(--ink);
+  font-size: 0.92rem;
+  word-break: break-all;
+}
+
+.ussd-provider-form.config-form {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.ussd-audit-card .config-card-body {
+  justify-content: flex-start;
+  gap: 1.1rem;
+}
+
+.ussd-audit-card .config-scene-header.ussd-audit-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ussd-audit-header-copy {
+  min-width: min(100%, 18rem);
+  flex: 1 1 16rem;
+}
+
+.ussd-audit-header .config-scene-lead {
+  max-width: 36rem;
+}
+
+.ussd-audit-empty {
+  padding: 2rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  text-align: center;
+  justify-items: center;
+}
+
+.ussd-audit-card .customers-table-wrap {
+  flex: 0 0 auto;
+  min-height: auto;
+  overflow: visible;
+}
+
+.ussd-audit-card .customers-table {
+  min-width: 36rem;
+}
+
+.ussd-audit-card .ussd-clip {
+  display: inline-block;
+  max-width: min(18rem, 32vw);
+  vertical-align: bottom;
+}
+
+.ussd-overview-card .config-card-body {
+  justify-content: flex-start;
+  gap: 1.1rem;
+}
+
+.ussd-overview-card .config-scene-header.ussd-overview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ussd-overview-header-copy {
+  min-width: min(100%, 18rem);
+  flex: 1 1 16rem;
+}
+
+.ussd-overview-header .config-scene-lead {
+  max-width: 36rem;
+}
+
+.ussd-overview-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+}
+
+.ussd-overview-meta p {
+  margin: 0.3rem 0 0;
+  color: var(--ink);
+  font-size: 0.92rem;
+  word-break: break-all;
+}
+
+.ussd-overview-stats {
+  margin: 0;
+}
+
+.ussd-overview-empty {
+  padding: 1.5rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  text-align: center;
+  justify-items: center;
+}
+
+.ussd-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.ussd-clip {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+
+.ussd-menus-card .config-card-body {
+  justify-content: flex-start;
+}
+
+.ussd-menus-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ussd-menus-header-copy {
+  min-width: min(100%, 18rem);
+  flex: 1 1 16rem;
+}
+
+.ussd-menus-header .config-scene-lead {
+  max-width: 36rem;
+}
+
+.ussd-menus-empty {
+  margin-top: 0.5rem;
+  padding: 2rem 1rem;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 0.55rem;
+}
+
+.ussd-menus-empty .config-btn {
+  margin-top: 0.35rem;
+}
+
+.ussd-menus {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+  width: 100%;
+}
+
+.ussd-menus-aside {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.ussd-menus-aside-label {
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.ussd-menus-editor {
+  min-width: 0;
+  display: grid;
+  gap: 0.85rem;
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--line);
+}
+
+.ussd-section-sub {
+  margin: 0.2rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+.ussd-config-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.ussd-config-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.8rem;
+}
+
+.ussd-config-row:hover {
+  background: var(--surface-muted);
+  border-color: var(--line-strong);
+}
+
+.ussd-config-row.is-active {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  background: color-mix(in srgb, var(--brand-green-soft) 65%, var(--panel));
+}
+
+.ussd-config-row-copy {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.ussd-config-row-copy strong {
+  font-weight: 650;
+  font-size: 0.95rem;
+}
+
+.ussd-config-row-copy span {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ussd-inline-field {
+  min-width: 10rem;
+  margin: 0;
+}
+
+.ussd-sim-card .config-card-body {
+  justify-content: flex-start;
+}
+
+.ussd-sim-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ussd-sim-header-copy {
+  min-width: min(100%, 18rem);
+  flex: 1 1 16rem;
+}
+
+.ussd-sim-header .config-scene-lead {
+  max-width: 38rem;
+}
+
+.ussd-sim-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
+  gap: 1.75rem;
+  align-items: start;
+  width: 100%;
+}
+
+.ussd-phone {
+  --phone-frame: #1a1a1c;
+  --phone-edge: #0b0b0c;
+  --phone-highlight: rgba(255, 255, 255, 0.14);
+  --phone-bezel: 0.5rem;
+  --phone-screen-radius: 1.85rem;
+  --phone-frame-radius: calc(var(--phone-screen-radius) + var(--phone-bezel));
+  position: relative;
+  justify-self: center;
+  width: min(100%, 300px);
+  padding: 0 0.55rem;
+}
+
+.ussd-phone-btn {
+  position: absolute;
+  background: linear-gradient(180deg, #2a2a2e, #141416);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 2;
+}
+
+.ussd-phone-btn--silent {
+  left: 0.1rem;
+  top: 6.2rem;
+  width: 0.28rem;
+  height: 1.1rem;
+  border-radius: 0.2rem 0 0 0.2rem;
+}
+
+.ussd-phone-btn--vol-up {
+  left: 0.05rem;
+  top: 8.1rem;
+  width: 0.32rem;
+  height: 2rem;
+  border-radius: 0.2rem 0 0 0.2rem;
+}
+
+.ussd-phone-btn--vol-down {
+  left: 0.05rem;
+  top: 10.4rem;
+  width: 0.32rem;
+  height: 2rem;
+  border-radius: 0.2rem 0 0 0.2rem;
+}
+
+.ussd-phone-btn--power {
+  right: 0.05rem;
+  top: 8.6rem;
+  width: 0.32rem;
+  height: 2.6rem;
+  border-radius: 0 0.2rem 0.2rem 0;
+}
+
+.ussd-phone-shell {
+  position: relative;
+  border-radius: var(--phone-frame-radius);
+  padding: var(--phone-bezel);
+  background:
+    linear-gradient(145deg, #3a3a40 0%, var(--phone-frame) 28%, var(--phone-edge) 100%);
+  box-shadow:
+    0 1px 0 var(--phone-highlight) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.45) inset,
+    0 18px 40px rgba(0, 0, 0, 0.28),
+    0 2px 8px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+[data-theme="dark"] .ussd-phone-shell {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.55) inset,
+    0 18px 42px rgba(0, 0, 0, 0.55);
+}
+
+.ussd-phone-glass {
+  position: relative;
+  width: 100%;
+  border-radius: var(--phone-screen-radius);
+  overflow: hidden;
+  background: #050505;
+  /* Single size rule so the bezel stays even around the display. */
+  aspect-ratio: 9 / 20.4;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+.ussd-phone-island {
+  position: absolute;
+  top: 0.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5.6rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  background: #000;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
+  z-index: 3;
+}
+
+.ussd-phone-island::after {
+  content: "";
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #2a3d55, #0a1420 70%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.ussd-phone-statusbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.15rem 0.35rem;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.ussd-phone-time {
+  padding-left: 0.15rem;
+}
+
+.ussd-phone-indicators {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+}
+
+.ussd-phone-signal,
+.ussd-phone-wifi,
+.ussd-phone-battery {
+  display: inline-block;
+  background: currentColor;
+}
+
+.ussd-phone-signal {
+  width: 0.95rem;
+  height: 0.55rem;
+  mask: linear-gradient(90deg, #000 0 18%, transparent 0) 0 100% / 18% 35%,
+    linear-gradient(90deg, #000 0 18%, transparent 0) 27% 100% / 18% 55%,
+    linear-gradient(90deg, #000 0 18%, transparent 0) 54% 100% / 18% 75%,
+    linear-gradient(90deg, #000 0 18%, transparent 0) 81% 100% / 18% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask: linear-gradient(90deg, #000 0 18%, transparent 0) 0 100% / 18% 35%,
+    linear-gradient(90deg, #000 0 18%, transparent 0) 27% 100% / 18% 55%,
+    linear-gradient(90deg, #000 0 18%, transparent 0) 54% 100% / 18% 75%,
+    linear-gradient(90deg, #000 0 18%, transparent 0) 81% 100% / 18% 100%;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.ussd-phone-wifi {
+  width: 0.85rem;
+  height: 0.6rem;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background: transparent;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  position: relative;
+}
+
+.ussd-phone-wifi::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.05rem;
+  width: 0.18rem;
+  height: 0.18rem;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.ussd-phone-battery {
+  width: 1.25rem;
+  height: 0.62rem;
+  border-radius: 0.15rem;
+  border: 1.5px solid currentColor;
+  background:
+    linear-gradient(90deg, currentColor 0 72%, transparent 0) padding-box;
+  background-clip: content-box;
+  padding: 1.5px;
+  position: relative;
+}
+
+.ussd-phone-battery::after {
+  content: "";
+  position: absolute;
+  right: -0.18rem;
+  top: 50%;
+  width: 0.12rem;
+  height: 0.28rem;
+  border-radius: 0 1px 1px 0;
+  background: currentColor;
+  transform: translateY(-50%);
+}
+
+.ussd-phone-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(120% 80% at 20% 0%, rgba(48, 168, 44, 0.28), transparent 55%),
+    radial-gradient(100% 70% at 90% 20%, rgba(27, 20, 100, 0.45), transparent 50%),
+    linear-gradient(165deg, #10131a 0%, #0a0c10 48%, #121820 100%);
+}
+
+.ussd-phone-screen {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.35rem 0.95rem 0.25rem;
+  color: #f4f6f8;
+}
+
+.ussd-phone-screen-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.ussd-phone-screen-label span:first-child {
+  color: #8fe08a;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.ussd-phone-screen-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.15rem 0;
+}
+
+.ussd-phone-screen-text {
+  margin: 0;
+  font-family: "Poppins", system-ui, sans-serif;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #f4f6f8;
+  word-break: break-word;
+}
+
+.ussd-phone-screen-text--menu {
+  font-size: 0.78rem;
+  line-height: 1.38;
+}
+
+.ussd-phone-screen-line {
+  min-height: 1.45em;
+}
+
+.ussd-phone-screen-text--menu .ussd-phone-screen-line {
+  min-height: 1.38em;
+}
+
+.ussd-phone-screen-opt strong {
+  font-weight: 700;
+  color: #fff;
+}
+
+.ussd-phone-screen-idle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.ussd-phone-screen-idle strong {
+  color: #fff;
+  font-weight: 650;
+}
+
+.ussd-phone-screen-reply input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.88);
+  padding: 0.4rem 0.1rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: center;
+  outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ussd-phone-screen-reply input::placeholder {
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 0.82rem;
+  font-weight: 450;
+  letter-spacing: 0.01em;
+}
+
+.ussd-phone-screen-reply input:focus,
+.ussd-phone-screen-reply input:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-bottom-color: rgba(255, 255, 255, 0.18);
+}
+
+.ussd-phone-screen-reply input:disabled {
+  opacity: 0.45;
+}
+
+.ussd-phone-touchpad {
+  flex-shrink: 0;
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.25rem 0.85rem 0.1rem;
+}
+
+.ussd-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 2.7rem);
+  justify-content: center;
+  gap: 0.55rem 1rem;
+}
+
+.ussd-keypad button {
+  width: 2.7rem;
+  height: 2.7rem;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  display: grid;
+  place-content: center;
+  gap: 0.02rem;
+  font: inherit;
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: background 120ms ease, transform 80ms ease;
+}
+
+.ussd-keypad button span {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1;
+  display: block;
+  text-align: center;
+}
+
+.ussd-keypad button small {
+  font-size: 0.48rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 650;
+  line-height: 1;
+}
+
+.ussd-keypad-key--solo {
+  place-items: center;
+  align-content: center;
+}
+
+.ussd-keypad-key--solo span {
+  transform: translateY(0.04em);
+}
+
+.ussd-keypad-key--star span {
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1;
+  transform: translateY(0.12em);
+}
+
+.ussd-keypad button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.ussd-keypad button:active:not(:disabled) {
+  transform: scale(0.94);
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.ussd-keypad button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ussd-phone-actions {
+  display: grid;
+  grid-template-columns: 3.15rem 3.15rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.1rem 0.15rem 0.2rem;
+}
+
+.ussd-phone-action {
+  width: 3.15rem;
+  height: 3.15rem;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+  transition: transform 80ms ease, filter 120ms ease;
+}
+
+.ussd-phone-action span {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.ussd-phone-action-icon {
+  width: 1.45rem;
+  height: 1.45rem;
+  display: block;
+  flex-shrink: 0;
+}
+
+.ussd-phone-action--back {
+  background: #d94848;
+}
+
+.ussd-phone-action--back .ussd-phone-action-icon {
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+.ussd-phone-action--call {
+  background: #2f9e44;
+}
+
+.ussd-phone-action:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.ussd-phone-action:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.ussd-phone-action:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ussd-phone-home {
+  width: 6.5rem;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  margin: 0.35rem auto 0.55rem;
+  flex-shrink: 0;
+}
+
+.ussd-sim-side {
+  min-width: 0;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.ussd-sim-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+}
+
+.ussd-sim-meta p {
+  margin: 0.3rem 0 0;
+  color: var(--ink);
+  font-size: 0.92rem;
+  word-break: break-all;
+}
+
+.ussd-sim-history {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.ussd-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.ussd-history-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.75rem;
+}
+
+.ussd-history-step {
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-deep);
+  background: color-mix(in srgb, var(--brand-green-soft) 80%, var(--panel));
+}
+
+.ussd-history-copy {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.ussd-history-copy strong {
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.ussd-history-copy span {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ussd-sim-history-empty {
+  padding: 1.25rem 0.75rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 960px) {
+  .ussd-menus,
+  .ussd-sim-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ussd-menus-editor {
+    padding-left: 0;
+    border-left: 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .ussd-menus-header,
+  .ussd-sim-header,
+  .ussd-analytics-header,
+  .ussd-sessions-header,
+  .ussd-provider-header {
+    align-items: stretch;
+  }
+
+  .ussd-menus-header .config-btn,
+  .ussd-sim-header .config-btn,
+  .ussd-provider-header .config-btn {
+    width: 100%;
+  }
+
+  .ussd-provider-meta,
+  .ussd-overview-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .ussd-overview-header {
+    align-items: stretch;
+  }
+
+  .ussd-analytics-filters.config-form {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .ussd-sessions-filters.config-form {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .ussd-phone {
+    width: min(100%, 300px);
+  }
+
+  .ussd-keypad {
+    grid-template-columns: repeat(3, 2.45rem);
+    gap: 0.45rem 0.85rem;
+  }
+
+  .ussd-keypad button {
+    width: 2.45rem;
+    height: 2.45rem;
+  }
+
+  .ussd-phone-action {
+    width: 2.9rem;
+    height: 2.9rem;
+  }
+
+  .ussd-phone-actions {
+    grid-template-columns: 2.9rem 2.9rem;
+  }
+
+  .ussd-phone-action span {
+    font-size: 0.68rem;
+  }
+
+  .ussd-phone-action--back .ussd-phone-action-icon {
+    width: 1.55rem;
+    height: 1.55rem;
+  }
+
+  .ussd-sim-meta {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Loading skeletons — match live section layouts */
+.ussd-page .customers-stat-card--skeleton {
+  display: grid;
+  gap: 0.65rem;
+  pointer-events: none;
+}
+
+.ussd-skel-stat-label {
+  width: min(6.5rem, 55%);
+  height: 0.65rem;
+  border-radius: 0.3rem;
+}
+
+.ussd-skel-stat-value {
+  width: min(4.25rem, 42%);
+  height: 1.35rem;
+  border-radius: 0.35rem;
+  animation-delay: 0.08s;
+}
+
+.ussd-overview-skeleton,
+.ussd-provider-skeleton {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.ussd-skel-meta-label {
+  display: block;
+  width: 5.5rem;
+  height: 0.62rem;
+  margin-bottom: 0.45rem;
+  border-radius: 0.3rem;
+}
+
+.ussd-skel-meta-value {
+  display: block;
+  width: 7rem;
+  height: 0.95rem;
+  border-radius: 0.35rem;
+  animation-delay: 0.06s;
+}
+
+.ussd-skel-meta-value--wide {
+  width: min(14rem, 85%);
+}
+
+.ussd-skel-help {
+  width: min(28rem, 90%);
+  height: 0.7rem;
+  border-radius: 0.3rem;
+  animation-delay: 0.12s;
+}
+
+.ussd-menus--skeleton {
+  pointer-events: none;
+}
+
+.ussd-config-row--skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 0.45rem;
+  background: var(--surface-muted);
+}
+
+.ussd-config-row--skeleton .ussd-config-row-copy {
+  display: grid;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.ussd-config-row--skeleton .skeleton-block--title {
+  width: 3.5rem;
+  height: 0.8rem;
+}
+
+.ussd-config-row--skeleton .skeleton-block--meta {
+  width: min(9rem, 70%);
+  height: 0.65rem;
+  animation-delay: 0.08s;
+}
+
+.ussd-skel-aside-label {
+  width: 4.5rem;
+  height: 0.65rem;
+  margin-bottom: 0.55rem;
+  border-radius: 0.3rem;
+}
+
+.ussd-skel-editor-head {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.ussd-skel-editor-title {
+  width: min(12rem, 70%);
+  height: 0.95rem;
+}
+
+.ussd-skel-editor-sub {
+  width: min(8rem, 45%);
+  height: 0.7rem;
+  animation-delay: 0.06s;
+}
+
+.ussd-skel-btn {
+  width: 6.5rem;
+  height: 2.35rem;
+  border-radius: 0.4rem;
+}
+
+.ussd-skel-field-label {
+  width: 6rem;
+  height: 0.62rem;
+  border-radius: 0.3rem;
+}
+
+.ussd-skel-textarea {
+  width: 100%;
+  height: 12rem;
+  border-radius: 0.4rem;
+  animation-delay: 0.1s;
+}
+
+.ussd-phone-screen-skel {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.15rem 0;
+}
+
+.ussd-skel-phone-line {
+  width: 88%;
+  height: 0.72rem;
+  border-radius: 0.25rem;
+}
+
+.ussd-skel-phone-line--md {
+  width: 72%;
+  animation-delay: 0.08s;
+}
+
+.ussd-skel-phone-line--sm {
+  width: 54%;
+  animation-delay: 0.14s;
+}
+
+.ussd-page .customers-table-row--skeleton .skeleton-block--title {
+  width: min(7.5rem, 80%);
+}
+
+.ussd-page .customers-table th .ussd-skel-th {
+  display: inline-block;
+  width: 3.75rem;
+  height: 0.6rem;
+  vertical-align: middle;
+}
+
+.ussd-analytics-card .customers-table-wrap,
+.ussd-sessions-card .customers-table-wrap {
+  flex: 0 0 auto;
+  min-height: auto;
+}

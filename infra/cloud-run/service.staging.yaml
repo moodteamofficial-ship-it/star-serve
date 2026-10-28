@@ -1,0 +1,84 @@
+# Cloud Run service — staging (APP_ENV=staging, staging data plane)
+# Behaves like local/dev: UAT providers, test amounts, /docs enabled, scale-to-zero.
+# Secrets come from Secret Manager at runtime. Never bake credentials into the image.
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: starserve-api-staging
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "10"
+        run.googleapis.com/cpu-throttling: "true"
+        run.googleapis.com/startup-cpu-boost: "true"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      serviceAccountName: starserve-api-staging@star-serve-508614.iam.gserviceaccount.com
+      containerConcurrency: 40
+      timeoutSeconds: 180
+      containers:
+        - image: europe-west1-docker.pkg.dev/star-serve-508614/starserve/api:staging
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /health
+            periodSeconds: 5
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /health
+          env:
+            - name: APP_ENV
+              value: staging
+            - name: APP_DEBUG
+              value: "false"
+            - name: ALLOW_INSECURE_PRODUCTION
+              value: "false"
+            - name: COOKIE_SECURE
+              value: "true"
+            - name: COOKIE_SAMESITE
+              value: none
+            - name: TRUST_X_FORWARDED_FOR
+              value: "true"
+            - name: TRUSTED_PROXY_HOPS
+              value: "2"
+            - name: STORAGE_BACKEND
+              value: gcs
+            - name: GCS_BUCKET
+              value: star_serve
+            - name: GCS_PREFIX
+              value: staging
+            - name: DB_PROVIDER
+              value: supabase
+            - name: SUPABASE_PROJECT_REF
+              value: wbasegyvtchdmkfkyoei
+            - name: SUPABASE_URL
+              value: https://wbasegyvtchdmkfkyoei.supabase.co
+            - name: DB_SSL_MODE
+              value: require
+            - name: DB_NULL_POOL
+              value: "true"
+            - name: DB_POOL_SIZE
+              value: "2"
+            - name: DB_MAX_OVERFLOW
+              value: "0"
+            - name: LOG_JSON
+              value: "true"
+            - name: JWT_ALGORITHM
+              value: RS256
+            - name: BIRDVIEW_LIVE
+              value: "true"
+            - name: BIRDVIEW_TEST_AMOUNT
+              value: "1"
+            - name: DEFINITE_ASSURANCE_TEST_AMOUNT_PAID
+              value: "1"
+            # Secret Manager bindings are applied by scripts/gcp/deploy.sh

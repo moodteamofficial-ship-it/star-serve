@@ -1,0 +1,45 @@
+# Render Blueprint — build API + SPA on Render from Git (no GCP Artifact Registry / Cloud Run).
+# Connect your GitHub repo in Render, then apply this blueprint or create services manually.
+#
+# Set RENDER_GIT_REPO to your remote, e.g. https://github.com/BirdviewInsurance/StarServe
+
+services:
+  - type: web
+    name: starserve-api
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    rootDir: v1.0/backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: APP_ENV
+        value: production
+      - key: STORAGE_BACKEND
+        value: gcs
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/gcs-sa.json
+      # Add secrets in Render dashboard — see scripts/render/print-production-env.sh
+
+  - type: web
+    name: starserve-dashboard-git
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    rootDir: v1.0/frontend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /ready
+    dockerCommand: ""
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SPA_BASE_PATH
+        value: /dashboard
+      - key: API_UPSTREAM
+        value: starserve-api.onrender.com
+    # Dockerfile build-args for Vite — set in Render dashboard → Docker → Build Args:
+    # VITE_BASE_PATH=/dashboard/
+    # VITE_DEFAULT_API_ENV=production
+    # VITE_WEB_URL_PRODUCTION=https://quote.starserveinsuranceagency.com/dashboard

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Generate JWT keys
+        run: |
+          mkdir -p secrets
+          openssl genrsa -out secrets/dev_jwt_private.pem 2048
+          openssl rsa -in secrets/dev_jwt_private.pem -pubout -out secrets/dev_jwt_public.pem
+      - name: Lint
+        run: ruff check app tests
+      - name: Unit + security tests
+        run: pytest tests/unit tests/security -q
+        env:
+          JWT_PRIVATE_KEY_PATH: ./secrets/dev_jwt_private.pem
+          JWT_PUBLIC_KEY_PATH: ./secrets/dev_jwt_public.pem
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm run build

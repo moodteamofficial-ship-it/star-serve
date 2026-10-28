@@ -1,0 +1,20 @@
+# Cloud Build / gcloud ignore — never upload credentials or local build junk.
+.git
+**/.venv/**
+**/node_modules/**
+**/.pytest_cache/**
+**/.ruff_cache/**
+**/.mypy_cache/**
+**/.env
+**/.env.*
+!**/.env.example
+**/secrets/**
+**/*.pem
+**/*.key
+**/data/**
+frontend/dist/
+frontend/node_modules/
+docs/
+backend/.coverage
+backend/htmlcov
+**/*.sql.gz

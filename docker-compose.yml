@@ -1,0 +1,110 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: starserve
+      POSTGRES_PASSWORD: starserve
+      # Bootstrap DB for init scripts; real app DBs are staging + live + backup below.
+      POSTGRES_DB: postgres
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init-data-planes.sh:/docker-entrypoint-initdb.d/01-data-planes.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U starserve -d starserve_staging"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Staging data plane (development / staging APP_ENV) — non-production data
+  api-staging:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+asyncpg://starserve:starserve@postgres:5432/starserve_staging
+      DATABASE_URL_DEVELOPMENT: postgresql+asyncpg://starserve:starserve@postgres:5432/starserve_staging
+      DATABASE_URL_STAGING: postgresql+asyncpg://starserve:starserve@postgres:5432/starserve_staging
+      REDIS_URL: redis://redis:6379/0
+      JWT_PRIVATE_KEY_PATH: /run/secrets/jwt_private.pem
+      JWT_PUBLIC_KEY_PATH: /run/secrets/jwt_public.pem
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend/secrets:/run/secrets:ro
+
+  # Live data plane (production APP_ENV) — customer data; separate DB process
+  api-live:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      # Local multi-plane only — never set on real Cloud Run production
+      ALLOW_INSECURE_PRODUCTION: "true"
+      DATABASE_URL: postgresql+asyncpg://starserve:starserve@postgres:5432/starserve_live
+      DATABASE_URL_PRODUCTION: postgresql+asyncpg://starserve:starserve@postgres:5432/starserve_live
+      REDIS_URL: redis://redis:6379/1
+      JWT_PRIVATE_KEY_PATH: /run/secrets/jwt_private.pem
+      JWT_PUBLIC_KEY_PATH: /run/secrets/jwt_public.pem
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+    ports:
+      - "127.0.0.1:8001:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend/secrets:/run/secrets:ro
+
+  # Backup data plane — restored / archival copy; separate DB process
+  api-backup:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      APP_ENV: backup
+      APP_DEBUG: "false"
+      DATABASE_URL: postgresql+asyncpg://starserve:starserve@postgres:5432/starserve_backup
+      DATABASE_URL_BACKUP: postgresql+asyncpg://starserve:starserve@postgres:5432/starserve_backup
+      REDIS_URL: redis://redis:6379/2
+      JWT_PRIVATE_KEY_PATH: /run/secrets/jwt_private.pem
+      JWT_PUBLIC_KEY_PATH: /run/secrets/jwt_public.pem
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+    ports:
+      - "127.0.0.1:8002:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend/secrets:/run/secrets:ro
+
+volumes:
+  postgres-data:

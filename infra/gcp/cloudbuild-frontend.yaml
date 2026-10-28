@@ -1,0 +1,64 @@
+# Build + deploy Star Serve frontend (SPA) to Cloud Run.
+# Source root: v1.0. Image context: frontend/.
+#
+#   gcloud builds submit --project=star-serve-508614 \
+#     --config=infra/gcp/cloudbuild-frontend.yaml \
+#     --substitutions=_ENV=staging
+#
+# The container serves the Vite production build and reverse-proxies /api to the
+# staging API so cookies stay first-party on the SPA Cloud Run URL.
+
+substitutions:
+  _ENV: staging
+  _REGION: europe-west1
+  _AR_REPO: starserve
+  # Host only (no scheme). Overridden per env in the deploy step when needed.
+  _API_UPSTREAM: starserve-api-staging-233389149626.europe-west1.run.app
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+
+timeout: 1200s
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    id: build
+    dir: frontend
+    args:
+      - build
+      - --tag=$_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/web:$BUILD_ID
+      - --tag=$_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/web:$_ENV
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    id: push-sha
+    args:
+      - push
+      - $_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/web:$BUILD_ID
+
+  - name: gcr.io/cloud-builders/docker
+    id: push-env
+    args:
+      - push
+      - $_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/web:$_ENV
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: deploy
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        chmod +x scripts/gcp/*.sh
+        API_HOST="$_API_UPSTREAM"
+        if [ "$_ENV" = "production" ]; then
+          API_HOST="starserve-api-233389149626.europe-west1.run.app"
+        fi
+        scripts/gcp/deploy-frontend.sh "$_ENV" \
+          "$_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/web:$BUILD_ID" \
+          "$$API_HOST"
+
+images:
+  - $_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/web:$BUILD_ID
+  - $_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/web:$_ENV

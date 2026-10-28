@@ -1,0 +1,16 @@
+.git
+.venv
+venv
+__pycache__
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.coverage
+htmlcov
+secrets
+*.pem
+*.key
+data
+.env
+.env.*
+*.egg-info

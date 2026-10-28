@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.gitignore
+*.md
+.env
+.env.*
+!.env.example
+.DS_Store
+coverage
+.vscode
+.idea
+*.log
+.vite
+npm-debug.log*
+Dockerfile*
+docker-entrypoint.sh.bak

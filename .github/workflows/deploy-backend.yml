@@ -1,0 +1,53 @@
+name: Deploy backend
+
+# Cloud Run deploys are opt-in only (no push auto-deploy).
+# Primary production API is Render — see docs/deployment/RENDER.md. Use this workflow for Cloud Run staging/rollback only.
+# CI (lint / unit / security / frontend build) stays in ci.yml and always runs.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Cloud Run target (manual emergency / staging only)
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+      confirm:
+        description: Type deploy to confirm (prevents accidental runs)
+        type: string
+        required: true
+
+concurrency:
+  group: deploy-backend-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Cloud Run ${{ inputs.environment }}
+    if: ${{ inputs.confirm == 'deploy' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      TARGET_ENV: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SA }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Submit Cloud Build
+        run: |
+          gcloud builds submit \
+            --project=star-serve-508614 \
+            --config=infra/gcp/cloudbuild.yaml \
+            --substitutions=_ENV=${TARGET_ENV}

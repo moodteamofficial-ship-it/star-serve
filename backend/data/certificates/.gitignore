@@ -1,0 +1,3 @@
+# Certificate PDFs (tenant/policy/cert). Never commit contents.
+data/certificates/**/*.pdf
+!.gitkeep

@@ -1,0 +1,143 @@
+# StarServe SPA under /dashboard (quote.* on Render).
+# App-only host: no marketing reverse-proxy (apex marketing TLS is separate).
+# Substituted at start: ${PORT} ${API_UPSTREAM}
+# Vite must be built with VITE_BASE_PATH=/dashboard/
+
+worker_processes auto;
+error_log /dev/stderr warn;
+pid /tmp/nginx.pid;
+
+events {
+  worker_connections 1024;
+}
+
+http {
+  include       /etc/nginx/mime.types;
+  default_type  application/octet-stream;
+  sendfile      on;
+  keepalive_timeout 65;
+  client_max_body_size 32m;
+  server_tokens off;
+
+  client_body_temp_path /tmp/client_temp;
+  proxy_temp_path       /tmp/proxy_temp;
+  fastcgi_temp_path     /tmp/fastcgi_temp;
+  uwsgi_temp_path       /tmp/uwsgi_temp;
+  scgi_temp_path        /tmp/scgi_temp;
+
+  map $http_x_forwarded_for $starserve_xff {
+    default $http_x_forwarded_for;
+    ""      $remote_addr;
+  }
+
+  log_format main '$remote_addr - $request $status $body_bytes_sent';
+  access_log /dev/stdout main;
+
+  upstream starserve_api {
+    server ${API_UPSTREAM}:443;
+    keepalive 16;
+  }
+
+  server {
+    listen ${PORT} default_server;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Behind Render TLS: never advertise the container listen port (:8080) in redirects.
+    absolute_redirect off;
+    port_in_redirect off;
+    server_name_in_redirect off;
+
+    location = /ready {
+      access_log off;
+      default_type text/plain;
+      return 200 'ok';
+    }
+
+    # Old Cloud Run paths (no /dashboard) → Render mount.
+    location ~ ^/(login|app)(/|$) {
+      return 302 /dashboard$request_uri;
+    }
+
+    location /api/ {
+      proxy_http_version 1.1;
+      proxy_set_header Host ${API_UPSTREAM};
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $starserve_xff;
+      proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header Connection "";
+      proxy_ssl_server_name on;
+      proxy_ssl_name ${API_UPSTREAM};
+      proxy_pass https://starserve_api;
+      proxy_read_timeout 180s;
+      proxy_send_timeout 180s;
+      proxy_connect_timeout 30s;
+      proxy_buffering off;
+      proxy_request_buffering off;
+    }
+
+    location = /health {
+      proxy_http_version 1.1;
+      proxy_set_header Host ${API_UPSTREAM};
+      proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header Connection "";
+      proxy_ssl_server_name on;
+      proxy_ssl_name ${API_UPSTREAM};
+      proxy_pass https://starserve_api/health;
+      proxy_read_timeout 30s;
+    }
+
+    # Trailing-slash normalize — relative Location (no :8080).
+    location = /dashboard {
+      return 302 /dashboard/;
+    }
+
+    # Dist-root static files (logo, favicon) — no try_files+alias.
+    location ~ ^/dashboard/(?<dash_static>[^/]+\.(png|svg|ico|webp|jpe?g|gif|webmanifest|txt))$ {
+      alias /usr/share/nginx/html/$dash_static;
+      add_header Cache-Control "public, max-age=86400" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      access_log off;
+    }
+
+    location /dashboard/fonts/ {
+      alias /usr/share/nginx/html/fonts/;
+      add_header Cache-Control "public, max-age=2592000" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      access_log off;
+    }
+
+    location /dashboard/assets/ {
+      alias /usr/share/nginx/html/assets/;
+      add_header Cache-Control "public, max-age=31536000, immutable" always;
+      add_header X-Frame-Options "DENY" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      access_log off;
+    }
+
+    location = /dashboard/index.html {
+      alias /usr/share/nginx/html/index.html;
+      default_type text/html;
+      add_header Cache-Control "no-cache" always;
+      add_header X-Frame-Options "DENY" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+      add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self'; worker-src 'self' blob:; frame-src 'self' blob:; media-src 'self' blob:" always;
+    }
+
+    # SPA routes: always serve index.html (assets/static matched above).
+    location /dashboard/ {
+      rewrite ^ /dashboard/index.html last;
+    }
+
+    # quote.* is app-only — send root (and Render HEAD / probes) to the SPA.
+    location / {
+      return 302 /dashboard/;
+    }
+  }
+}
