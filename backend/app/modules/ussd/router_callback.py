@@ -95,6 +95,14 @@ async def ussd_callback(
         return _safe_end(adapter)
 
     body_bytes = b""
+    if request.method.upper() == "GET":
+        probe = extract_birdview_params(request, None)
+        if not (probe.get("SESSIONID") and probe.get("MSISDN")):
+            return adapter.render(
+                text=_static_welcome_text(),
+                response_type=UssdResponseType.CONTINUE.value,
+            )
+
     try:
         if request.method.upper() == "POST":
             body_bytes = await request.body()
