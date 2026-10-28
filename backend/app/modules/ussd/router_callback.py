@@ -26,8 +26,16 @@ from app.modules.ussd.models import UssdProviderSetting
 from app.modules.ussd.providers import get_adapter
 from app.modules.ussd.providers.birdview import (
     BirdviewAdapter,
+    extract_birdview_params,
     looks_like_birdview,
     normalize_ussd_code,
+)
+
+_BARE_URL_WELCOME = (
+    "Welcome to StarServe Insurance\n"
+    "1. Motor Insurance Cover\n"
+    "2. Report a Claim\n"
+    "3. Follow Up a Claim"
 )
 
 logger = get_logger(__name__)
@@ -65,6 +73,11 @@ async def ussd_callback(
     if not getattr(settings, "ussd_enabled", True):
         return _safe_end(adapter)
 
+    if request.method.upper() == "GET":
+        probe = extract_birdview_params(request, None)
+        if not (probe.get("SESSIONID") and probe.get("MSISDN")):
+            return adapter.render(text=_BARE_URL_WELCOME, response_type="CONTINUE")
+
     body_bytes = b""
     try:
         if request.method.upper() == "POST":
@@ -78,8 +91,6 @@ async def ussd_callback(
         # Resolve service / tenant. USSDCODE is for provider lookup only — not menu routing.
         service_code = ""
         if looks_like_birdview(request, body_bytes or None):
-            from app.modules.ussd.providers.birdview import extract_birdview_params
-
             params = extract_birdview_params(request, body_bytes or None)
             service_code = normalize_ussd_code(params.get("USSDCODE"))
         elif body_bytes:
