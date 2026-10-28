@@ -104,12 +104,10 @@ async def ussd_callback(
                 "2. Report a Claim\n"
                 "3. Follow Up a Claim"
             )
-            rendered = adapter.render(
+            return adapter.render(
                 text=welcome,
                 response_type=UssdResponseType.CONTINUE.value,
             )
-            rendered.headers["X-StarServe-Ussd"] = "welcome-probe"
-            return rendered
 
     try:
         if request.method.upper() == "POST":
