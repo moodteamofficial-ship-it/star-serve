@@ -44,3 +44,21 @@ services:
     # VITE_BASE_PATH=/dashboard/
     # VITE_DEFAULT_API_ENV=production
     # VITE_WEB_URL_PRODUCTION=https://quote.starserveinsuranceagency.com/dashboard
+
+  - type: web
+    name: starserve-marketing
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    rootDir: v1.0/frontend
+    dockerfilePath: ./Dockerfile.marketing
+    healthCheckPath: /ready
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SITE_ROLE
+        value: marketing
+      - key: SPA_BASE_PATH
+        value: ""
+      - key: API_UPSTREAM
+        value: starserve-api.onrender.com

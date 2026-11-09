@@ -34,6 +34,8 @@ from app.modules.tenants.router import router as tenants_router
 from app.modules.users.router import router as users_router
 from app.modules.ussd.router_admin import router as ussd_admin_router
 from app.modules.ussd.router_callback import router as ussd_callback_router
+from app.modules.website.router_admin import router as website_admin_router
+from app.modules.website.router_public import router as website_public_router
 from app.modules.wallets.router import router as wallets_router
 
 api_router = APIRouter()
@@ -69,4 +71,6 @@ api_router.include_router(notifications_router)
 api_router.include_router(reports_router)
 api_router.include_router(ussd_callback_router)
 api_router.include_router(ussd_admin_router)
+api_router.include_router(website_public_router)
+api_router.include_router(website_admin_router)
 api_router.include_router(audit_router)

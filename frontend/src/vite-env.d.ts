@@ -17,6 +17,10 @@ interface ImportMetaEnv {
   readonly VITE_WEB_URL_STAGING?: string;
   readonly VITE_WEB_URL_PRODUCTION?: string;
   readonly VITE_WEB_URL_BACKUP?: string;
+  /** "marketing" serves the public www site; default "app" is quote + dashboard. */
+  readonly VITE_SITE_ROLE?: "app" | "marketing";
+  /** Public marketing origin used by QR / install helpers. */
+  readonly VITE_MARKETING_PUBLIC_URL?: string;
 }
 
 interface ImportMeta {

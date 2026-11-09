@@ -7,23 +7,22 @@ PORT="${PORT:-8080}"
 API_UPSTREAM="${API_UPSTREAM:-starserve-api.onrender.com}"
 API_UPSTREAM="$(printf '%s' "$API_UPSTREAM" | sed -e 's|^https://||' -e 's|^http://||' -e 's|/.*||')"
 
-# Empty or / → Cloud Run root template. /dashboard → Render mount (quote.*).
+# Empty or / → Cloud Run root template.
+# /dashboard → quote.* dashboard mount.
+# SITE_ROLE=marketing → www / apex public site.
 SPA_BASE_PATH="${SPA_BASE_PATH:-}"
 SPA_BASE_PATH="$(printf '%s' "$SPA_BASE_PATH" | sed -e 's|/*$||')"
+SITE_ROLE="${SITE_ROLE:-app}"
 TEMPLATE="/etc/nginx/nginx.conf.template"
-if [ "$SPA_BASE_PATH" = "/dashboard" ]; then
+if [ "$SITE_ROLE" = "marketing" ]; then
+  TEMPLATE="/etc/nginx/nginx.marketing.conf.template"
+elif [ "$SPA_BASE_PATH" = "/dashboard" ]; then
   TEMPLATE="/etc/nginx/nginx.dashboard.conf.template"
 fi
 
 export PORT API_UPSTREAM
-if [ "$SPA_BASE_PATH" = "/dashboard" ]; then
-  envsubst '${PORT} ${API_UPSTREAM}' \
-    < "$TEMPLATE" \
-    > /etc/nginx/nginx.conf
-else
-  envsubst '${PORT} ${API_UPSTREAM}' \
-    < "$TEMPLATE" \
-    > /etc/nginx/nginx.conf
-fi
+envsubst '${PORT} ${API_UPSTREAM}' \
+  < "$TEMPLATE" \
+  > /etc/nginx/nginx.conf
 
 exec nginx -g 'daemon off;'

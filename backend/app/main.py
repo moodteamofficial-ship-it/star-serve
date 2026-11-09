@@ -33,6 +33,7 @@ from app.modules.commissions import models as _commission_models  # noqa: F401
 from app.modules.insurer_catalog import models as _insurer_catalog_models  # noqa: F401
 from app.modules.referrals import models as _referral_models  # noqa: F401
 from app.modules.ussd import models as _ussd_models  # noqa: F401
+from app.modules.website import models as _website_models  # noqa: F401
 
 logger = get_logger(__name__)
 

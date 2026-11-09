@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:marketing": "VITE_SITE_ROLE=marketing VITE_BASE_PATH=/ vite",
     "build": "tsc -b && vite build",
+    "build:marketing": "VITE_SITE_ROLE=marketing VITE_BASE_PATH=/ vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"

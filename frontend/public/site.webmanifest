@@ -1,0 +1,33 @@
+{
+  "name": "Star Serve Insurance Agency",
+  "short_name": "Star Serve",
+  "description": "Insurance, Just a Touch Away. Digital cover for vehicle, home, health, family and business in Kenya.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f6f4",
+  "theme_color": "#30a82c",
+  "lang": "en",
+  "categories": ["finance", "business"],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

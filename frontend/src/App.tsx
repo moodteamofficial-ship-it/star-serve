@@ -28,6 +28,7 @@ import { ReportsPage } from "@/features/reports/ReportsPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 import { UsersPage } from "@/features/users/UsersPage";
 import { UssdPage } from "@/features/ussd/UssdPage";
+import { WebsiteAdminPage } from "@/features/website/WebsiteAdminPage";
 import { WelcomePage } from "@/features/welcome/WelcomePage";
 import { AgentRegisterPage } from "@/features/welcome/AgentRegisterPage";
 import { appBasename } from "@/app/router/basePath";
@@ -78,6 +79,7 @@ export default function App() {
                   <Route path="branches" element={<BranchesPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="ussd" element={<UssdPage />} />
+                  <Route path="website" element={<WebsiteAdminPage />} />
                   <Route path="platform" element={<PlatformPage />} />
                 </Route>
               </Route>

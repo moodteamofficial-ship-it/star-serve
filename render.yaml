@@ -75,5 +75,25 @@ services:
       - key: EMAIL_SMTP_USE_TLS
         value: "true"
       - key: CORS_ORIGINS
-        value: http://localhost:5173,http://127.0.0.1:5173,https://quote.starserveinsuranceagency.com,https://www.starserveinsuranceagency.com,https://starserveinsuranceagency.com,https://starserve-dashboard.onrender.com
+        value: http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,https://quote.starserveinsuranceagency.com,https://www.starserveinsuranceagency.com,https://starserveinsuranceagency.com,https://starserve-dashboard.onrender.com,https://starserve-marketing.onrender.com
       # Secrets: run ./scripts/render/sync-api-after-create.sh (reads v1.0/.env)
+
+  # Public marketing site (www / apex). Quote dashboard stays on starserve-dashboard.
+  - type: web
+    name: starserve-marketing
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    rootDir: frontend
+    dockerfilePath: ./Dockerfile.marketing
+    dockerContext: .
+    healthCheckPath: /ready
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SITE_ROLE
+        value: marketing
+      - key: SPA_BASE_PATH
+        value: ""
+      - key: API_UPSTREAM
+        value: starserve-api.onrender.com

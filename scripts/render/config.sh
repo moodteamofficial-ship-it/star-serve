@@ -8,6 +8,7 @@ source "${SCRIPT_DIR}/../gcp/config.sh"
 # Host only — no scheme. Set after creating the Render web service, or override per command.
 RENDER_API_HOST="${RENDER_API_HOST:-starserve-api.onrender.com}"
 RENDER_DASHBOARD_HOST="${RENDER_DASHBOARD_HOST:-starserve-dashboard.onrender.com}"
+RENDER_MARKETING_HOST="${RENDER_MARKETING_HOST:-starserve-marketing.onrender.com}"
 
 # Render resource IDs (Birdview workspace — do not commit RENDER_API_KEY).
 RENDER_OWNER_ID="${RENDER_OWNER_ID:-tea-d0iqggbuibrs73evhssg}"

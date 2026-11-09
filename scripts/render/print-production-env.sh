@@ -32,11 +32,12 @@ sys.stdout.write(value)
 PY
 }
 
-CORS_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
+CORS_ORIGINS="http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"
 CORS_ORIGINS="${CORS_ORIGINS},https://quote.starserveinsuranceagency.com"
 CORS_ORIGINS="${CORS_ORIGINS},https://www.starserveinsuranceagency.com"
 CORS_ORIGINS="${CORS_ORIGINS},https://starserveinsuranceagency.com"
 CORS_ORIGINS="${CORS_ORIGINS},https://${RENDER_DASHBOARD_HOST}"
+CORS_ORIGINS="${CORS_ORIGINS},https://${RENDER_MARKETING_HOST}"
 CORS_ORIGINS="${CORS_ORIGINS},https://starserve-dashboard-staging-233389149626.europe-west1.run.app"
 CORS_ORIGINS="${CORS_ORIGINS},https://starserve-api-233389149626.europe-west1.run.app"
 CORS_ORIGINS="${CORS_ORIGINS},https://starserve-api-staging-233389149626.europe-west1.run.app"

@@ -120,6 +120,12 @@ const NAV: NavEntry[] = [
           icon: IconPhone,
           anyPermission: ["ussd:read", "ussd:manage", "ussd:analytics"],
         },
+        {
+          to: "/app/website",
+          label: "Website",
+          icon: IconGrid,
+          anyPermission: ["website:read", "website:edit", "website:publish"],
+        },
         { to: "/app/audit", label: "Audit", icon: IconFileText, permission: "audit:read" },
         {
           to: "/app/settings",

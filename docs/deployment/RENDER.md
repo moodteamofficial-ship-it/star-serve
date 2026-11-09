@@ -7,7 +7,11 @@ services. You do **not** need Cloud Run or GCP billing for the API if you use
 | Service | Typical deploy | Health |
 |---------|----------------|--------|
 | SPA (`starserve-dashboard`) | Git `frontend/` (Docker) on `moodteamofficial-ship-it/star-serve` | `/ready` |
+| Marketing (`starserve-marketing`) | Git `frontend/Dockerfile.marketing` → www / apex | `/ready` |
 | API (`starserve-api`) | Git `backend/` or Docker Hub / GHCR | `/health` |
+
+Public www cutover (GoDaddy + custom domains): see
+[`MARKETING_WWW.md`](./MARKETING_WWW.md).
 
 Do **not** use GAR `web:render` on Render — GCP billing blocks image pulls. Same-origin `/api/v1` is proxied by nginx to `API_UPSTREAM`.
 
@@ -236,6 +240,26 @@ known and update Render env.
 
 1. Attach `quote.starserveinsuranceagency.com` in Render.
 2. DNS CNAME `quote` → `starserve-dashboard.onrender.com` (or Render’s target).
+
+## 4b. Marketing web service (`starserve-marketing`)
+
+Separate from the dashboard so www cutover cannot break quote.
+
+| Field | Value |
+|--------|--------|
+| Dockerfile | `frontend/Dockerfile.marketing` |
+| Health check | `/ready` |
+| `SITE_ROLE` | `marketing` |
+| `API_UPSTREAM` | `starserve-api.onrender.com` |
+| Custom domains | `www.starserveinsuranceagency.com` + apex |
+
+```bash
+export RENDER_API_KEY=rnd_...
+export RENDER_GIT_REPO=https://github.com/moodteamofficial-ship-it/star-serve
+./scripts/render/deploy-marketing.sh
+```
+
+Full GoDaddy steps: [`MARKETING_WWW.md`](./MARKETING_WWW.md).
 
 ## 5. Routing (unchanged behaviour)
 

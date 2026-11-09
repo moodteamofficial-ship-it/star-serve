@@ -27,6 +27,7 @@ ARG VITE_WEB_URL_STAGING=https://starserve-dashboard-staging-233389149626.europe
 ARG VITE_WEB_URL_PRODUCTION=https://quote.starserveinsuranceagency.com/dashboard
 ARG VITE_WEB_URL_DEVELOPMENT=
 ARG VITE_WEB_URL_BACKUP=
+ARG VITE_SITE_ROLE=app
 
 ENV VITE_APP_NAME=$VITE_APP_NAME \
     VITE_DEFAULT_API_ENV=$VITE_DEFAULT_API_ENV \
@@ -40,7 +41,8 @@ ENV VITE_APP_NAME=$VITE_APP_NAME \
     VITE_WEB_URL_STAGING=$VITE_WEB_URL_STAGING \
     VITE_WEB_URL_PRODUCTION=$VITE_WEB_URL_PRODUCTION \
     VITE_WEB_URL_DEVELOPMENT=$VITE_WEB_URL_DEVELOPMENT \
-    VITE_WEB_URL_BACKUP=$VITE_WEB_URL_BACKUP
+    VITE_WEB_URL_BACKUP=$VITE_WEB_URL_BACKUP \
+    VITE_SITE_ROLE=$VITE_SITE_ROLE
 
 RUN npm run build \
   && find dist -name '*.map' -delete
@@ -55,6 +57,7 @@ RUN apk add --no-cache curl \
 
 COPY nginx.conf.template /etc/nginx/nginx.conf.template
 COPY nginx.dashboard.conf.template /etc/nginx/nginx.dashboard.conf.template
+COPY nginx.marketing.conf.template /etc/nginx/nginx.marketing.conf.template
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=build /app/dist /usr/share/nginx/html
 
