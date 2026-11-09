@@ -29,7 +29,7 @@ RENDER_API_BRANCH="${RENDER_API_BRANCH:-main}"
 RENDER_API_ROOT_DIR="${RENDER_API_ROOT_DIR:-backend}"
 
 render_log() {
-  printf '[render] %s\n' "$*"
+  printf '[render] %s\n' "$*" >&2
 }
 
 render_die() {

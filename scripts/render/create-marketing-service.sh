@@ -17,7 +17,7 @@ source "${SCRIPT_DIR}/render-api.sh"
 
 EXISTING="$(render_api_service_id starserve-marketing 2>/dev/null || true)"
 if [ -n "${EXISTING}" ]; then
-  render_log "starserve-marketing already exists: ${EXISTING}"
+  render_log "starserve-marketing already exists: ${EXISTING}" >&2
   printf '%s' "${EXISTING}"
   exit 0
 fi
@@ -30,7 +30,7 @@ RENDER_MARKETING_IMAGE="${RENDER_MARKETING_IMAGE:-}"
 CREATE_JSON=""
 
 if [ -n "${RENDER_GIT_REPO}" ]; then
-  render_log "Creating starserve-marketing from Git ${RENDER_GIT_REPO} (${RENDER_GIT_BRANCH})"
+  render_log "Creating starserve-marketing from Git ${RENDER_GIT_REPO} (${RENDER_GIT_BRANCH})" >&2
   CREATE_JSON="$(RENDER_OWNER_ID="${RENDER_OWNER_ID}" \
     RENDER_ENVIRONMENT_ID="${RENDER_ENVIRONMENT_ID}" \
     RENDER_GIT_REPO="${RENDER_GIT_REPO}" \
@@ -62,7 +62,7 @@ print(json.dumps({
 PY
 )"
 elif [ -n "${RENDER_MARKETING_IMAGE}" ]; then
-  render_log "Creating starserve-marketing from image ${RENDER_MARKETING_IMAGE}"
+  render_log "Creating starserve-marketing from image ${RENDER_MARKETING_IMAGE}" >&2
   CREATE_JSON="$(RENDER_OWNER_ID="${RENDER_OWNER_ID}" \
     RENDER_ENVIRONMENT_ID="${RENDER_ENVIRONMENT_ID}" \
     RENDER_REGISTRY_CREDENTIAL_ID="${RENDER_REGISTRY_CREDENTIAL_ID:-}" \
@@ -101,5 +101,5 @@ RESP="$(render_curl -X POST "https://api.render.com/v1/services" \
   -d "${CREATE_JSON}")"
 SERVICE_ID="$(printf '%s' "${RESP}" | python3 -c 'import json,sys; d=json.load(sys.stdin); s=d.get("service") or d; print(s.get("id") or "")')"
 [ -n "${SERVICE_ID}" ] || render_die "Create failed: ${RESP}"
-render_log "Created starserve-marketing: ${SERVICE_ID}"
+render_log "Created starserve-marketing: ${SERVICE_ID}" >&2
 printf '%s' "${SERVICE_ID}"
